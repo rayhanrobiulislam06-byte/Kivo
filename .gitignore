@@ -7,3 +7,5 @@ node_modules/
 *.p12
 *.keystore
 *.jks
+
+kivo.db
