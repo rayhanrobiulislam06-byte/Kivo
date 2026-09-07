@@ -1,0 +1,776 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background: #ffffff;
+    color: #202123;
+}
+
+body {
+    overflow: hidden;
+}
+
+button,
+textarea {
+    font: inherit;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    width: 100%;
+    height: 100dvh;
+
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #ffffff;
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar {
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 12px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #eeeeee;
+
+    z-index: 20;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 600;
+    color: #202123;
+}
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: transparent;
+    color: #202123;
+
+    font-size: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.icon-button:active {
+    background: #eeeeee;
+}
+
+
+/* =========================
+   CHAT
+========================= */
+
+.chat {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding:
+        24px
+        16px
+        150px;
+
+    scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior: contain;
+}
+
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome {
+    min-height: 70%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+}
+
+.kivo-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    margin-bottom: 18px;
+
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #202123;
+    color: #ffffff;
+
+    font-size: 24px;
+    font-weight: 700;
+
+    line-height: 48px;
+
+    text-align: center;
+}
+
+.welcome h1 {
+    margin: 0;
+
+    font-size: 27px;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   MESSAGES
+========================= */
+
+.message {
+    width: 100%;
+
+    max-width: 760px;
+
+    margin:
+        0
+        auto
+        22px;
+
+    display: flex;
+
+    font-size: 15px;
+
+    line-height: 1.55;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.user .message-content {
+    max-width: 82%;
+
+    padding:
+        10px
+        14px;
+
+    border-radius: 18px;
+
+    background: #f4f4f4;
+}
+
+.message.bot {
+    justify-content: flex-start;
+}
+
+.message.bot .message-content {
+    width: 100%;
+}
+
+
+/* =========================
+   INPUT AREA
+========================= */
+
+.input-area {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 50;
+
+    padding:
+        8px
+        12px
+        calc(
+            8px +
+            env(safe-area-inset-bottom)
+        );
+
+    background: #ffffff;
+
+    pointer-events: none;
+
+    transform: none;
+
+    transition: none;
+
+    will-change: auto;
+}
+
+/* =========================
+   INPUT BOX
+========================= */
+
+.input-box {
+    width: 100%;
+
+    max-width: 760px;
+
+    min-height: 52px;
+
+    margin: 0 auto;
+
+    padding:
+        6px
+        8px
+        6px
+        14px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 8px;
+
+    border:
+        1px
+        solid
+        #d9d9d9;
+
+    border-radius: 26px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 10px
+        rgba(0, 0, 0, 0.06);
+
+    pointer-events: auto;
+}
+
+
+/* =========================
+   MESSAGE INPUT
+========================= */
+
+#messageInput {
+    flex: 1;
+
+    width: 100%;
+
+    min-width: 0;
+
+    min-height: 38px;
+
+    max-height: 140px;
+
+    padding:
+        8px
+        0;
+
+    margin: 0;
+
+    resize: none;
+
+    border: 0;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #202123;
+
+    font-size: 16px;
+
+    line-height: 1.45;
+
+    -webkit-appearance: none;
+
+    appearance: none;
+
+    overflow-y: auto;
+
+    -webkit-user-select: text;
+
+    user-select: text;
+
+    caret-color: #202123;
+}
+
+#messageInput::placeholder {
+    color: #8e8e8e;
+
+    opacity: 1;
+}
+
+#messageInput:focus {
+    color: #202123;
+
+    outline: none;
+}
+
+
+/* =========================
+   SEND BUTTON
+========================= */
+
+.send-button {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+    min-height: 38px;
+
+    flex: 0 0 38px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: #202123;
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    line-height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+
+    appearance: none;
+}
+
+.send-button:disabled {
+    opacity: 0.45;
+
+    cursor: default;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: 285px;
+
+    padding: 14px;
+
+    z-index: 100;
+
+    background: #ffffff;
+
+    border-right:
+        1px
+        solid
+        #e5e5e5;
+
+    box-shadow:
+        4px 0 18px
+        rgba(0, 0, 0, 0.08);
+
+    transform:
+        translateX(-100%);
+
+    transition:
+        transform 0.22s ease;
+}
+
+.sidebar.open {
+    transform:
+        translateX(0);
+}
+
+.sidebar-header {
+    height: 45px;
+
+    margin-bottom: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.sidebar-header strong {
+    font-size: 18px;
+}
+
+
+/* =========================
+   NEW CHAT
+========================= */
+
+.new-chat-button {
+    width: 100%;
+
+    padding:
+        12px
+        14px;
+
+    border:
+        1px
+        solid
+        #dddddd;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #202123;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+
+    appearance: none;
+}
+
+.new-chat-button:active {
+    background: #f5f5f5;
+}
+
+
+/* =========================
+   CONVERSATION LIST
+========================= */
+
+.conversation-list {
+    margin-top: 18px;
+
+    max-height:
+        calc(
+            100vh - 130px
+        );
+
+    overflow-y: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.conversation-row {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    margin-bottom: 3px;
+
+    border-radius: 9px;
+}
+
+.conversation-row:hover {
+    background: #f2f2f2;
+}
+
+.conversation-row.active {
+    background: #f2f2f2;
+}
+
+.conversation-item {
+    flex: 1;
+
+    min-width: 0;
+
+    padding:
+        11px
+        8px
+        11px
+        12px;
+
+    color: #333333;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.conversation-menu {
+    width: 34px;
+    height: 34px;
+
+    margin-right: 5px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #555555;
+
+    font-size: 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+
+    appearance: none;
+}
+
+.conversation-menu:hover {
+    background: #e5e5e5;
+}
+
+
+/* =========================
+   DELETE MENU
+========================= */
+
+.delete-menu {
+    position: absolute;
+
+    top: 39px;
+    right: 5px;
+
+    min-width: 100px;
+
+    padding: 5px;
+
+    z-index: 200;
+
+    background: #ffffff;
+
+    border:
+        1px
+        solid
+        #dddddd;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.12);
+}
+
+.delete-button {
+    width: 100%;
+
+    padding:
+        9px
+        10px;
+
+    border: 0;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #d00;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+
+    appearance: none;
+}
+
+.delete-button:hover {
+    background: #f5f5f5;
+}
+
+
+/* =========================
+   SIDEBAR OVERLAY
+========================= */
+
+.sidebar-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 90;
+
+    background:
+        rgba(0, 0, 0, 0.20);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity 0.2s ease;
+}
+
+.sidebar-overlay.open {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .app {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+
+    .topbar {
+        height: 56px;
+    }
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+
+    .chat {
+        padding-left: 12px;
+        padding-right: 12px;
+
+        padding-bottom: 145px;
+    }
+
+    .sidebar {
+        width: 82vw;
+
+        max-width: 320px;
+    }
+
+    .message.user .message-content {
+        max-width: 88%;
+    }
+
+    .input-area {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .input-box {
+        min-height: 50px;
+
+        border-radius: 25px;
+    }
+
+    #messageInput {
+        font-size: 16px;
+
+        min-height: 36px;
+    }
+}
+
+
+/* =========================
+   KEYBOARD / SMALL HEIGHT
+========================= */
+
+@media (max-height: 500px) {
+
+    .topbar {
+        height: 50px;
+    }
+
+    .chat {
+        padding-top: 12px;
+        padding-bottom: 110px;
+    }
+
+    .welcome {
+        min-height: 55%;
+    }
+
+    .welcome h1 {
+        font-size: 21px;
+    }
+
+    .kivo-icon {
+        width: 42px;
+        height: 42px;
+
+        flex-basis: 42px;
+
+        line-height: 42px;
+
+        font-size: 21px;
+
+        margin-bottom: 10px;
+    }
+}

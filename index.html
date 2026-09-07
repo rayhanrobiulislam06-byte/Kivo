@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <meta
+        name="theme-color"
+        content="#ffffff"
+    >
+
+    <title>Kivo</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <button
+            id="menuButton"
+            class="icon-button"
+            aria-label="Open menu"
+        >
+            ☰
+        </button>
+
+
+        <div class="logo">
+            Kivo
+        </div>
+
+
+        <button
+            id="newChatButton"
+            class="icon-button"
+            aria-label="New chat"
+        >
+            ＋
+        </button>
+
+    </header>
+
+
+    <!-- CHAT -->
+
+    <main
+        id="chat"
+        class="chat"
+    >
+
+        <div
+            id="welcome"
+            class="welcome"
+        >
+
+            <div class="kivo-icon">
+                K
+            </div>
+
+            <h1>
+                How can I help you?
+            </h1>
+
+        </div>
+
+    </main>
+
+
+    <!-- INPUT -->
+
+    <div class="input-area">
+
+        <div class="input-box">
+
+            <textarea
+    id="messageInput"
+    placeholder="Ask Anything..."
+    rows="1"
+    autocomplete="off"
+    autocorrect="on"
+    autocapitalize="sentences"
+    spellcheck="true"
+    inputmode="text"
+></textarea>
+
+
+            <button
+                id="sendButton"
+                class="send-button"
+                aria-label="Send"
+            >
+                ↑
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SIDEBAR OVERLAY -->
+
+<div
+    id="sidebarOverlay"
+    class="sidebar-overlay"
+></div>
+
+
+<!-- SIDEBAR -->
+
+<aside
+    id="sidebar"
+    class="sidebar"
+>
+
+    <div class="sidebar-header">
+
+        <strong>
+            Kivo
+        </strong>
+
+
+        <button
+            id="closeSidebar"
+            class="icon-button"
+            aria-label="Close menu"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <button
+        id="sidebarNewChat"
+        class="new-chat-button"
+    >
+        ＋ New Chat
+    </button>
+
+
+    
+
+
+    <div
+        id="conversationList"
+        class="conversation-list"
+    ></div>
+
+</aside>
+
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
