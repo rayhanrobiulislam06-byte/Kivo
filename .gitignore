@@ -9,3 +9,4 @@ node_modules/
 *.jks
 
 kivo.db
+server.js.before-*
