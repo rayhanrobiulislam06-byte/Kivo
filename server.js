@@ -1272,7 +1272,248 @@ app.delete(
     }
 );
 
+/* =========================
+   DONATIONS — TEST ONLY
+========================= */
 
+app.post(
+    "/donations",
+    (req, res) => {
+
+        try {
+
+            const amount =
+                String(
+                    req.body?.amount || ""
+                ).trim();
+
+            if (!amount) {
+
+                return res.status(400).json({
+                    error: "Donation amount is required"
+                });
+
+            }
+
+            const donationId =
+                `DON-${crypto.randomUUID()}`;
+
+            const createdAt =
+                Date.now();
+
+            db.prepare(`
+                INSERT INTO donations (
+                    donation_id,
+                    amount,
+                    currency,
+                    network,
+                    status,
+                    created_at
+                )
+                VALUES (?, ?, 'USDT', 'TRC20', 'pending', ?)
+            `).run(
+                donationId,
+                amount,
+                createdAt
+            );
+
+            res.status(201).json({
+
+                success: true,
+
+                testMode: true,
+
+                donation: {
+                    donationId,
+                    amount,
+                    currency: "USDT",
+                    network: "TRC20",
+                    status: "pending",
+                    createdAt
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Donation create error:",
+                error
+            );
+
+            res.status(500).json({
+                error: "Could not create donation"
+            });
+
+        }
+
+    }
+);
+
+
+app.get(
+    "/donations/:id",
+    (req, res) => {
+
+        try {
+
+            const donationId =
+                String(
+                    req.params.id || ""
+                ).trim();
+
+            if (!donationId) {
+
+                return res.status(400).json({
+                    error: "Donation ID is required"
+                });
+
+            }
+
+            const donation =
+                db.prepare(`
+                    SELECT
+                        donation_id,
+                        amount,
+                        currency,
+                        network,
+                        tx_hash,
+                        status,
+                        created_at,
+                        verified_at
+                    FROM donations
+                    WHERE donation_id = ?
+                `).get(donationId);
+
+            if (!donation) {
+
+                return res.status(404).json({
+                    error: "Donation not found"
+                });
+
+            }
+
+            res.json({
+                success: true,
+                testMode: true,
+                donation
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Donation lookup error:",
+                error
+            );
+
+            res.status(500).json({
+                error: "Could not load donation"
+            });
+
+        }
+
+    }
+);
+
+
+app.post(
+    "/donations/:id/test-verify",
+    (req, res) => {
+
+        try {
+
+            const donationId =
+                String(
+                    req.params.id || ""
+                ).trim();
+
+            if (!donationId) {
+
+                return res.status(400).json({
+                    error: "Donation ID is required"
+                });
+
+            }
+
+            const existing =
+                db.prepare(`
+                    SELECT donation_id, status
+                    FROM donations
+                    WHERE donation_id = ?
+                `).get(donationId);
+
+            if (!existing) {
+
+                return res.status(404).json({
+                    error: "Donation not found"
+                });
+
+            }
+
+            if (existing.status !== "pending") {
+
+                return res.status(400).json({
+                    error:
+                        "Only pending donations can be test-verified"
+                });
+
+            }
+
+            const verifiedAt =
+                Date.now();
+
+            db.prepare(`
+                UPDATE donations
+                SET
+                    status = 'verified',
+                    verified_at = ?
+                WHERE donation_id = ?
+            `).run(
+                verifiedAt,
+                donationId
+            );
+
+            const donation =
+                db.prepare(`
+                    SELECT
+                        donation_id,
+                        amount,
+                        currency,
+                        network,
+                        tx_hash,
+                        status,
+                        created_at,
+                        verified_at
+                    FROM donations
+                    WHERE donation_id = ?
+                `).get(donationId);
+
+            res.json({
+
+                success: true,
+
+                testMode: true,
+
+                donation
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Donation test verification error:",
+                error
+            );
+
+            res.status(500).json({
+                error:
+                    "Could not test-verify donation"
+            });
+
+        }
+
+    }
+);
 /* =========================
    CHAT
 ========================= */
