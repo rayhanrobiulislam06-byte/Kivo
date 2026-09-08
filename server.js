@@ -63,8 +63,19 @@ db.exec(`
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL
     );
-`);
 
+    CREATE TABLE IF NOT EXISTS donations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        donation_id TEXT NOT NULL UNIQUE,
+        amount TEXT NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'USDT',
+        network TEXT NOT NULL DEFAULT 'TRC20',
+        tx_hash TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at INTEGER NOT NULL,
+        verified_at INTEGER
+    );
+`);
 
 /* =========================
    SAFE MIGRATIONS
