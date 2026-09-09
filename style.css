@@ -774,3 +774,127 @@ button {
         margin-bottom: 10px;
     }
 }
+/* =========================
+   DONATION MODAL
+========================= */
+
+.donation-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.donation-modal.open {
+    display: flex;
+}
+
+.donation-modal-content {
+    width: min(100%, 430px);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 22px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+}
+
+.donation-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.donation-modal-header h2 {
+    margin: 0;
+    font-size: 21px;
+}
+
+.donation-network {
+    margin: 8px 0 20px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.donation-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.donation-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+}
+
+.donation-input:focus {
+    border-color: #888;
+}
+
+.donation-address-section {
+    margin-top: 18px;
+}
+
+.donation-address-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.donation-address-row code {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f3f3f3;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.donation-copy-button {
+    flex-shrink: 0;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.donation-continue-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.donation-status {
+    min-height: 20px;
+    margin: 12px 0 0;
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .donation-modal {
+        padding: 12px;
+    }
+
+    .donation-modal-content {
+        padding: 18px;
+        border-radius: 16px;
+    }
+}

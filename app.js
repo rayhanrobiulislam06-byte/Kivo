@@ -12,6 +12,27 @@ const sidebarNewChat = document.getElementById("sidebarNewChat");
 const conversationList = document.getElementById("conversationList");
 const donateButton = document.getElementById("donateButton");
 
+const donationModal =
+    document.getElementById("donationModal");
+
+const closeDonationButton =
+    document.getElementById("closeDonationButton");
+
+const donationAmount =
+    document.getElementById("donationAmount");
+
+const copyDonationAddress =
+    document.getElementById("copyDonationAddress");
+
+const donationContinueButton =
+    document.getElementById("donationContinueButton");
+
+const donationAddress =
+    document.getElementById("donationAddress");
+
+const donationStatus =
+    document.getElementById("donationStatus");
+
 /* =========================
    BACKEND
 ========================= */
@@ -801,18 +822,155 @@ if (sidebarNewChat) {
    DONATE
 ========================= */
 
-if (donateButton) {
+function openDonationModal() {
 
+    if (!donationModal) {
+        return;
+    }
+
+    donationModal.classList.add("open");
+    donationModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    if (donationStatus) {
+        donationStatus.textContent = "";
+    }
+
+    if (donationAmount) {
+        donationAmount.focus();
+    }
+}
+
+function closeDonationModal() {
+
+    if (!donationModal) {
+        return;
+    }
+
+    donationModal.classList.remove("open");
+    donationModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+if (donateButton) {
     donateButton.addEventListener(
         "click",
-        () => {
-            alert(
-                "Donation feature is currently in test mode."
-            );
+        openDonationModal
+    );
+}
+
+if (closeDonationButton) {
+    closeDonationButton.addEventListener(
+        "click",
+        closeDonationModal
+    );
+}
+
+if (donationModal) {
+    donationModal.addEventListener(
+        "click",
+        event => {
+
+            if (event.target === donationModal) {
+                closeDonationModal();
+            }
+
         }
     );
 }
 
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            donationModal &&
+            donationModal.classList.contains("open")
+        ) {
+            closeDonationModal();
+        }
+
+    }
+);
+
+/* =========================
+   DONATION ACTIONS
+========================= */
+
+if (copyDonationAddress) {
+    copyDonationAddress.addEventListener(
+        "click",
+        async () => {
+
+            const address =
+                donationAddress?.textContent?.trim();
+
+            if (
+                !address ||
+                address === "Wallet address will appear here"
+            ) {
+                if (donationStatus) {
+                    donationStatus.textContent =
+                        "Receiving address is not configured yet.";
+                }
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(address);
+
+                if (donationStatus) {
+                    donationStatus.textContent =
+                        "Address copied.";
+                }
+
+            } catch {
+                if (donationStatus) {
+                    donationStatus.textContent =
+                        "Could not copy the address.";
+                }
+            }
+        }
+    );
+}
+
+if (donationContinueButton) {
+    donationContinueButton.addEventListener(
+        "click",
+        () => {
+
+            const value =
+                donationAmount?.value?.trim() || "";
+
+            const amount =
+                Number(value);
+
+            if (
+                !value ||
+                !Number.isFinite(amount) ||
+                amount <= 0
+            ) {
+                if (donationStatus) {
+                    donationStatus.textContent =
+                        "Please enter a valid donation amount.";
+                }
+
+                donationAmount?.focus();
+                return;
+            }
+
+            if (donationStatus) {
+                donationStatus.textContent =
+                    "Amount accepted. Payment setup is not active yet.";
+            }
+        }
+    );
+}
 
 /* =========================
    SEND BUTTON
