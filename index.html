@@ -177,6 +177,106 @@
 </aside>
 
 
+<!-- DONATION MODAL -->
+
+<div
+    id="donationModal"
+    class="donation-modal"
+    aria-hidden="true"
+>
+
+    <div
+        class="donation-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="donationTitle"
+    >
+
+        <div class="donation-modal-header">
+
+            <h2 id="donationTitle">
+                ❤️ Support Kivo
+            </h2>
+
+            <button
+                id="closeDonationButton"
+                class="icon-button"
+                type="button"
+                aria-label="Close donation"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <p class="donation-network">
+            USDT • TRC20
+        </p>
+
+
+        <label
+            class="donation-label"
+            for="donationAmount"
+        >
+            Donation amount
+        </label>
+
+        <input
+            id="donationAmount"
+            class="donation-input"
+            type="text"
+            inputmode="decimal"
+            placeholder="Enter amount"
+            autocomplete="off"
+        >
+
+
+        <div class="donation-address-section">
+
+            <span class="donation-label">
+                Receiving address
+            </span>
+
+            <div class="donation-address-row">
+
+                <code id="donationAddress">
+                    Wallet address will appear here
+                </code>
+
+                <button
+                    id="copyDonationAddress"
+                    class="donation-copy-button"
+                    type="button"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="donationContinueButton"
+            class="donation-continue-button"
+            type="button"
+        >
+            Continue
+        </button>
+
+
+        <p
+            id="donationStatus"
+            class="donation-status"
+            aria-live="polite"
+        ></p>
+
+    </div>
+
+</div>
+
+
 <script src="app.js"></script>
 
 </body>
