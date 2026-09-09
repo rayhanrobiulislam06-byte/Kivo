@@ -10,6 +10,7 @@ const closeSidebarButton = document.getElementById("closeSidebar");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
 const sidebarNewChat = document.getElementById("sidebarNewChat");
 const conversationList = document.getElementById("conversationList");
+const donateButton = document.getElementById("donateButton");
 
 /* =========================
    BACKEND
@@ -792,6 +793,23 @@ if (sidebarNewChat) {
     sidebarNewChat.addEventListener(
         "click",
         startNewChat
+    );
+}
+
+
+/* =========================
+   DONATE
+========================= */
+
+if (donateButton) {
+
+    donateButton.addEventListener(
+        "click",
+        () => {
+            alert(
+                "Donation feature is currently in test mode."
+            );
+        }
     );
 }
 
