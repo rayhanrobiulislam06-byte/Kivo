@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#ffffff">
+<title>Kivo UI Preview</title>
+
+<style>
+:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --ink: #1e1e1e;
+    --muted: #696969;
+    --border: #e6e6e8;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    font: inherit;
+    touch-action: manipulation;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.95);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+    flex-shrink: 0;
+}
+
+.icon-button {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button svg,
+.send svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.logo {
+    flex: 1;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.welcome {
+    margin: auto;
+    text-align: center;
+    padding: 8px;
+}
+
+.k-logo {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    border-radius: 24px;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+h1 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.25;
+}
+
+.subtitle {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.chat {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+body.chatting .welcome {
+    display: none;
+}
+
+body.chatting .chat {
+    display: flex;
+}
+
+.bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 20px;
+    font-size: 16px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.bubble.user {
+    align-self: flex-end;
+    background: var(--ink);
+    color: #fff;
+    border-bottom-right-radius: 6px;
+}
+
+.bubble.bot {
+    align-self: flex-start;
+    background: var(--surface);
+    color: var(--ink);
+    border-bottom-left-radius: 6px;
+}
+
+.composer-area {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 8px 16px calc(12px + env(safe-area-inset-bottom));
+}
+
+.composer {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    background: var(--surface);
+    border-radius: 24px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    padding: 0 14px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+}
+
+.send {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 18px;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .15s;
+}
+
+.send:disabled {
+    opacity: .3;
+    cursor: default;
+}
+
+
+/* ===== Kivo Sidebar ===== */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.22);
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.sidebar {
+    position: fixed;
+    z-index: 21;
+    top: 0;
+    left: 0;
+    width: min(320px, 86vw);
+    height: 100%;
+    height: 100dvh;
+    padding: calc(10px + env(safe-area-inset-top)) 12px
+             calc(12px + env(safe-area-inset-bottom));
+    background: var(--bg);
+    box-shadow: 8px 0 30px rgba(0,0,0,.12);
+    transform: translateX(-105%);
+    transition: transform .22s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.sidebar-open .sidebar {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    margin-bottom: 8px;
+}
+
+.sidebar-title {
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.sidebar-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-new-chat {
+    width: 100%;
+    min-height: 52px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    text-align: left;
+    padding: 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar-section {
+    margin-top: 22px;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sidebar-item {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 6px;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    padding: 0 12px;
+    font-size: 15px;
+}
+
+.sidebar-item:active,
+.sidebar-new-chat:active {
+    background: var(--surface);
+}
+
+
+/* ===== Donation Panel ===== */
+.donation-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0,0,0,.22);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.donation-panel.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.donation-card {
+    width: min(720px, 100%);
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px calc(22px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 35px rgba(0,0,0,.15);
+}
+
+.donation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.donation-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.donation-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    font-size: 24px;
+}
+
+.donation-description {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.network-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 7px;
+}
+
+.network-value {
+    font-size: 16px;
+    font-weight: 650;
+    margin-bottom: 14px;
+}
+
+.address-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 6px;
+}
+
+.address-box code {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.copy-address {
+    border: 0;
+    border-radius: 14px;
+    background: var(--ink);
+    color: #fff;
+    padding: 11px 14px;
+    font-size: 14px;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    border-radius: 14px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* ===== Conversations Panel ===== */
+.utility-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 31;
+    background: rgba(0,0,0,.22);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.utility-panel.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.utility-card {
+    width: min(720px, 100%);
+    max-height: 78vh;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px calc(22px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 35px rgba(0,0,0,.15);
+}
+
+.utility-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.utility-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.utility-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    font-size: 24px;
+}
+
+.utility-description {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.conversation-empty {
+    padding: 24px 16px;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--muted);
+    text-align: center;
+    font-size: 15px;
+}
+
+.conversation-current {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--surface);
+    margin-bottom: 10px;
+}
+
+.conversation-current-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.conversation-current-meta {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* ===== Settings ===== */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-row:last-child {
+    border-bottom: 0;
+}
+
+.settings-label {
+    font-weight: 600;
+}
+
+.settings-value {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: right;
+}
+
+
+/* ChatGPT-style conversation history */
+.conversation-card {
+    max-height: 86vh;
+    overflow: hidden;
+}
+
+.conversation-card #conversationList {
+    overflow-y: auto;
+    max-height: calc(86vh - 78px);
+    padding-bottom: 8px;
+}
+
+.conversation-group {
+    margin-top: 18px;
+}
+
+.conversation-group:first-child {
+    margin-top: 4px;
+}
+
+.conversation-group-title {
+    padding: 0 6px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: .55;
+    letter-spacing: .2px;
+}
+
+.conversation-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    margin: 3px 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.conversation-row:hover,
+.conversation-row.current {
+    background: var(--surface, rgba(127,127,127,.10));
+}
+
+.conversation-row-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.conversation-row-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-row-preview {
+    margin-top: 3px;
+    font-size: 12px;
+    opacity: .55;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-row-time {
+    flex: 0 0 auto;
+    font-size: 11px;
+    opacity: .45;
+}
+
+.conversation-empty {
+    padding: 48px 20px;
+    text-align: center;
+    font-size: 14px;
+    opacity: .55;
+}
+
+.conversation-empty-subtitle {
+    margin-top: 7px;
+    font-size: 12px;
+    opacity: .7;
+}
+
+
+/* kivo-repair */
+.conversation-row-actions { flex: 0 0 auto; }
+.conversation-delete {
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 6px 8px;
+}
+.conversation-delete:active { background: var(--surface); }
+</style>
+</head>
+
+<body>
+
+
+<!-- Kivo Sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar" aria-label="Kivo menu">
+    <div class="sidebar-header">
+        <div class="sidebar-title">Kivo</div>
+        <button class="sidebar-close" id="closeSidebar" type="button" aria-label="Close menu">×</button>
+    </div>
+
+    <button class="sidebar-new-chat" id="sidebarNewChat" type="button">
+        ＋ New Chat
+    </button>
+
+    <div class="sidebar-section">Your chats</div>
+
+    <button class="sidebar-item" type="button" id="historyItem">
+        Conversations
+    </button>
+
+    <button class="sidebar-item" type="button" id="donationItem">
+        Donation
+    </button>
+
+    <button class="sidebar-item" type="button" id="settingsItem">
+        About
+    </button>
+</aside>
+
+<header class="topbar">
+    <button class="icon-button" id="menu" type="button" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+
+    <div class="logo">Kivo</div>
+
+    <button class="icon-button" id="newChat" type="button" aria-label="New chat">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+</header>
+
+<main class="main" id="main">
+
+    <section class="welcome" id="welcome">
+        <div class="k-logo">K</div>
+        <h1>How can I help you?</h1>
+        <div class="subtitle">Ask anything with Kivo.</div>
+    </section>
+
+    <section class="chat" id="chat"></section>
+
+</main>
+
+<footer class="composer-area">
+    <form class="composer" id="form" autocomplete="off">
+        <input
+            id="message"
+            type="text"
+            placeholder="Ask anything..."
+            aria-label="Message"
+            enterkeyhint="send"
+            autocomplete="off"
+            autocapitalize="sentences"
+        >
+        <button class="send" id="send" type="submit" aria-label="Send" disabled>
+            <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+    </form>
+</footer>
+
+
+<!-- Donation -->
+<div class="donation-panel" id="donationPanel">
+    <div class="donation-card">
+        <div class="donation-header">
+            <div class="donation-title">Support Kivo</div>
+            <button class="donation-close" id="closeDonation" type="button"
+                    aria-label="Close donation">×</button>
+        </div>
+
+        <div class="donation-description">
+            If you would like to support Kivo, you can use the supported
+            donation network below.
+        </div>
+
+        <div class="network-label">Network</div>
+        <div class="network-value">USDT (TRC20)</div>
+
+        <div class="network-label">TRC20 Address</div>
+        <div class="address-box">
+            <code id="donationAddress">YOUR_TRC20_ADDRESS</code>
+            <button class="copy-address" id="copyDonationAddress"
+                    type="button">Copy</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Conversations -->
+<div class="utility-panel" id="conversationsPanel">
+    <div class="utility-card">
+        <div class="utility-header">
+            <div class="utility-title">Conversations</div>
+            <button class="utility-close" id="closeConversations"
+                    type="button" aria-label="Close conversations">×</button>
+        </div>
+
+        <div class="utility-description">
+            Your current and saved Kivo conversations will appear here.
+        </div>
+
+        <div id="conversationList"></div>
+    </div>
+</div>
+
+<!-- About -->
+<div class="utility-panel" id="settingsPanel">
+    <div class="utility-card">
+        <div class="utility-header">
+            <div class="utility-title">About</div>
+            <button class="utility-close" id="closeSettings"
+                    type="button" aria-label="Close about">×</button>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">App</div>
+            </div>
+            <div class="settings-value">Kivo</div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">Version</div>
+            </div>
+            <div class="settings-value">0.1.0</div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">AI Engine</div>
+            </div>
+            <div class="settings-value">
+                Kivo backend API<br><span id="aboutApiBase">http://127.0.0.1:3001</span>
+            </div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">Storage</div>
+            </div>
+            <div class="settings-value">Backend SQLite database</div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+    "use strict";
+
+    const API_BASE = "http://127.0.0.1:3001";
+    const PLACEHOLDER_ADDRESS = "YOUR_TRC20_ADDRESS";
+
+    function byId(id) {
+        return document.getElementById(id);
+    }
+
+    function showFatal(message) {
+        console.error(message);
+        const banner = document.createElement("div");
+        banner.setAttribute("role", "alert");
+        banner.style.cssText =
+            "position:fixed;top:0;left:0;right:0;z-index:100;" +
+            "padding:12px 16px;background:#b00020;color:#fff;" +
+            "font:14px/1.4 system-ui,sans-serif;";
+        banner.textContent = message;
+        document.body.appendChild(banner);
+    }
+
+    /* ---------- Core elements: missing => clear error ---------- */
+    const CORE_IDS = ["main", "chat", "form", "message", "send"];
+    const missingCore = CORE_IDS.filter(id => !byId(id));
+
+    if (missingCore.length) {
+        showFatal(
+            "Kivo UI error: missing required element(s): " +
+            missingCore.join(", ")
+        );
+        return;
+    }
+
+    const body = document.body;
+    const main = byId("main");
+    const chat = byId("chat");
+    const form = byId("form");
+    const input = byId("message");
+    const send = byId("send");
+
+    /* ---------- Optional elements ---------- */
+    const toast = byId("toast");
+    const sidebarOverlay = byId("sidebarOverlay");
+    const closeSidebar = byId("closeSidebar");
+    const sidebarNewChat = byId("sidebarNewChat");
+    const historyItem = byId("historyItem");
+    const settingsItem = byId("settingsItem");
+    const donationItem = byId("donationItem");
+    const conversationsPanel = byId("conversationsPanel");
+    const closeConversations = byId("closeConversations");
+    const aboutPanel = byId("settingsPanel");
+    const closeAbout = byId("closeSettings");
+    const donationPanel = byId("donationPanel");
+    const closeDonation = byId("closeDonation");
+    const menuButton = byId("menu");
+    const newChatButton = byId("newChat");
+    const copyButton = byId("copyDonationAddress");
+    const donationAddress = byId("donationAddress");
+    const conversationList = byId("conversationList");
+    const aboutApiBase = byId("aboutApiBase");
+
+    if (aboutApiBase) aboutApiBase.textContent = API_BASE;
+
+    /* ---------- State ---------- */
+    let currentConversationId = null;
+    let conversations = [];
+    let sending = false;
+    let toastTimer = null;
+
+    /* ---------- API layer: keeps real backend errors ---------- */
+    class ApiError extends Error {
+        constructor(kind, message, status) {
+            super(message);
+            this.kind = kind;
+            this.status = status || 0;
+        }
+    }
+
+    async function api(path, options) {
+        let response;
+
+        try {
+            response = await fetch(API_BASE + path, options);
+        } catch (error) {
+            console.error("Network error:", error);
+            throw new ApiError(
+                "network",
+                "Cannot reach the Kivo server (" + API_BASE +
+                "). Check that the backend and proxy are running.",
+                0
+            );
+        }
+
+        const raw = await response.text().catch(() => "");
+        let data = null;
+
+        try {
+            data = raw ? JSON.parse(raw) : {};
+        } catch (error) {
+            data = null;
+        }
+
+        if (!response.ok) {
+            const message =
+                (data && (data.error || data.message)) ||
+                raw.slice(0, 200) ||
+                response.statusText ||
+                "Request failed";
+            throw new ApiError("backend", String(message), response.status);
+        }
+
+        if (data === null) {
+            throw new ApiError(
+                "backend",
+                "Server returned a non-JSON response.",
+                response.status
+            );
+        }
+
+        return data;
+    }
+
+    function describeError(error) {
+        if (error instanceof ApiError) {
+            if (error.kind === "backend") {
+                return "Kivo error" +
+                    (error.status ? " (HTTP " + error.status + ")" : "") +
+                    ": " + error.message;
+            }
+            return error.message;
+        }
+        return "Unexpected error: " + (error && error.message || error);
+    }
+
+    /* ---------- UI helpers ---------- */
+    function showToast(text) {
+        if (!toast) return;
+        toast.textContent = text;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function scrollToBottom() {
+        main.scrollTop = main.scrollHeight;
+    }
+
+    function updateSendState() {
+        send.disabled = sending || !input.value.trim();
+    }
+
+    function addBubble(text, who) {
+        const el = document.createElement("div");
+        el.className = "bubble " + who;
+        el.textContent = text;
+        chat.appendChild(el);
+        scrollToBottom();
+        return el;
+    }
+
+    function renderMessages(messages) {
+        chat.innerHTML = "";
+
+        (messages || []).forEach(message => {
+            if (!message || !message.text) return;
+            addBubble(
+                String(message.text),
+                message.type === "user" ? "user" : "bot"
+            );
+        });
+
+        body.classList.toggle("chatting", chat.children.length > 0);
+        scrollToBottom();
+    }
+
+    function clearChat() {
+        chat.innerHTML = "";
+        body.classList.remove("chatting");
+        input.value = "";
+        updateSendState();
+    }
+
+    /* ---------- Sidebar and panels ---------- */
+    function openSidebar() {
+        body.classList.add("sidebar-open");
+    }
+
+    function closeSidebarMenu() {
+        body.classList.remove("sidebar-open");
+    }
+
+    function closePanels() {
+        [conversationsPanel, aboutPanel, donationPanel].forEach(panel => {
+            if (panel) panel.classList.remove("show");
+        });
+    }
+
+    function openPanel(panel) {
+        closePanels();
+        closeSidebarMenu();
+        if (panel) panel.classList.add("show");
+    }
+
+    function startNewChat() {
+        currentConversationId = null;
+        clearChat();
+        closePanels();
+        closeSidebarMenu();
+        input.focus();
+    }
+
+    /* ---------- Conversations ---------- */
+    function getMessages(conversation) {
+        if (Array.isArray(conversation.history)) return conversation.history;
+        if (Array.isArray(conversation.messages)) return conversation.messages;
+        return [];
+    }
+
+    function getConversationTitle(conversation) {
+        if (conversation.title) return conversation.title;
+        const firstUser = getMessages(conversation).find(
+            m => m && m.type === "user" && m.text
+        );
+        return (firstUser && firstUser.text) || "New chat";
+    }
+
+    function getConversationPreview(conversation) {
+        const messages = getMessages(conversation);
+        const last = messages[messages.length - 1];
+        return (last && last.text) || "";
+    }
+
+    function toTime(value) {
+        if (typeof value === "number") return value;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    function formatConversationTime(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleString([], {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        });
+    }
+
+    function selectConversation(conversation) {
+        currentConversationId = conversation.id;
+        renderMessages(getMessages(conversation));
+        input.value = "";
+        updateSendState();
+        closePanels();
+    }
+
+    function renderConversations() {
+        if (!conversationList) return;
+        conversationList.innerHTML = "";
+
+        if (!conversations.length) {
+            const empty = document.createElement("div");
+            empty.className = "conversation-empty";
+            empty.textContent = "No conversations yet.";
+            conversationList.appendChild(empty);
+            return;
+        }
+
+        const sorted = [...conversations].sort(
+            (a, b) => toTime(b.updatedAt) - toTime(a.updatedAt)
+        );
+
+        sorted.forEach(conversation => {
+            const row = document.createElement("div");
+            row.className = "conversation-row";
+            row.setAttribute("role", "button");
+            row.tabIndex = 0;
+
+            if (conversation.id === currentConversationId) {
+                row.classList.add("current");
+            }
+
+            const content = document.createElement("div");
+            content.className = "conversation-row-main";
+
+            const title = document.createElement("div");
+            title.className = "conversation-row-title";
+            title.textContent = getConversationTitle(conversation);
+
+            const preview = document.createElement("div");
+            preview.className = "conversation-row-preview";
+            preview.textContent = getConversationPreview(conversation);
+
+            const time = document.createElement("div");
+            time.className = "conversation-row-time";
+            time.textContent = formatConversationTime(conversation.updatedAt);
+
+            const actions = document.createElement("div");
+            actions.className = "conversation-row-actions";
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "conversation-delete";
+            deleteButton.textContent = "Delete";
+            deleteButton.setAttribute("aria-label", "Delete conversation");
+
+            deleteButton.addEventListener("click", event => {
+                event.stopPropagation();
+                deleteConversation(conversation.id);
+            });
+
+            content.appendChild(title);
+            content.appendChild(preview);
+            actions.appendChild(deleteButton);
+
+            row.appendChild(content);
+            row.appendChild(time);
+            row.appendChild(actions);
+
+            row.addEventListener("click", () => selectConversation(conversation));
+            row.addEventListener("keydown", event => {
+                if (event.target === row && event.key === "Enter") {
+                    selectConversation(conversation);
+                }
+            });
+
+            conversationList.appendChild(row);
+        });
+    }
+
+    async function loadConversations() {
+        try {
+            const data = await api("/conversations");
+            conversations = Array.isArray(data.conversations)
+                ? data.conversations
+                : [];
+            renderConversations();
+        } catch (error) {
+            console.error("Conversation load error:", error);
+            showToast("Could not load conversations: " + describeError(error));
+        }
+        return conversations;
+    }
+
+    async function openConversations() {
+        openPanel(conversationsPanel);
+        await loadConversations();
+    }
+
+    async function deleteConversation(id) {
+        const conversation = conversations.find(item => item.id === id);
+        const title = conversation
+            ? getConversationTitle(conversation)
+            : "this conversation";
+
+        if (!window.confirm('Delete "' + title + '"?')) return;
+
+        try {
+            const data = await api(
+                "/conversations/" + encodeURIComponent(id),
+                { method: "DELETE" }
+            );
+
+            if (data && data.success === false) {
+                throw new ApiError("backend", "Delete was not confirmed.", 200);
+            }
+
+            if (currentConversationId === id) {
+                currentConversationId = null;
+                clearChat();
+            }
+
+            await loadConversations();
+            showToast("Conversation deleted.");
+        } catch (error) {
+            console.error("Delete conversation error:", error);
+            showToast("Could not delete: " + describeError(error));
+        }
+    }
+
+    /* ---------- Chat ---------- */
+    async function sendKivoMessage(text) {
+        if (sending) return;
+
+        sending = true;
+        updateSendState();
+
+        const thinking = addBubble("Thinking...", "bot");
+
+        try {
+            const data = await api("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: text,
+                    conversationId: currentConversationId
+                })
+            });
+
+            thinking.remove();
+
+            if (data.conversationId) {
+                currentConversationId = data.conversationId;
+            }
+
+            if (Array.isArray(data.history) && data.history.length) {
+                renderMessages(data.history);
+            } else if (typeof data.reply === "string" && data.reply) {
+                addBubble(data.reply, "bot");
+            } else {
+                throw new ApiError(
+                    "backend",
+                    "Server response did not contain a reply.",
+                    200
+                );
+            }
+
+            loadConversations();
+        } catch (error) {
+            console.error("Kivo chat error:", error);
+            thinking.remove();
+            addBubble(describeError(error), "bot");
+        } finally {
+            sending = false;
+            updateSendState();
+            input.focus();
+        }
+    }
+
+    /* ---------- Copy ---------- */
+    function legacyCopy(text) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+        document.body.appendChild(area);
+        area.select();
+        const ok = document.execCommand("copy");
+        area.remove();
+        if (!ok) throw new Error("copy failed");
+    }
+
+    async function copyDonationAddress() {
+        const text = donationAddress ? donationAddress.textContent.trim() : "";
+
+        if (!text || text === PLACEHOLDER_ADDRESS) {
+            showToast("Donation address is not set yet.");
+            return;
+        }
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                legacyCopy(text);
+            }
+            showToast("Address copied.");
+        } catch (error) {
+            try {
+                legacyCopy(text);
+                showToast("Address copied.");
+            } catch (fallbackError) {
+                showToast("Could not copy the address.");
+            }
+        }
+    }
+
+    /* ---------- Event wiring (each element independent) ---------- */
+    function on(element, eventName, handler, label) {
+        if (!element) {
+            console.warn("Kivo: element not found, skipped:", label);
+            return;
+        }
+        element.addEventListener(eventName, handler);
+    }
+
+    function closeOnBackdrop(panel) {
+        on(panel, "click", event => {
+            if (event.target === panel) closePanels();
+        }, "panel backdrop");
+    }
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const text = input.value.trim();
+        if (!text || sending) return;
+
+        body.classList.add("chatting");
+        addBubble(text, "user");
+        input.value = "";
+        updateSendState();
+
+        sendKivoMessage(text);
+    });
+
+    input.addEventListener("input", updateSendState);
+
+    on(menuButton, "click", openSidebar, "menu");
+    on(closeSidebar, "click", closeSidebarMenu, "closeSidebar");
+    on(sidebarOverlay, "click", closeSidebarMenu, "sidebarOverlay");
+    on(newChatButton, "click", startNewChat, "newChat");
+    on(sidebarNewChat, "click", startNewChat, "sidebarNewChat");
+
+    on(historyItem, "click", openConversations, "historyItem");
+    on(closeConversations, "click", closePanels, "closeConversations");
+
+    on(donationItem, "click", () => openPanel(donationPanel), "donationItem");
+    on(closeDonation, "click", closePanels, "closeDonation");
+    on(copyButton, "click", copyDonationAddress, "copyDonationAddress");
+
+    on(settingsItem, "click", () => openPanel(aboutPanel), "settingsItem");
+    on(closeAbout, "click", closePanels, "closeSettings");
+
+    closeOnBackdrop(conversationsPanel);
+    closeOnBackdrop(aboutPanel);
+    closeOnBackdrop(donationPanel);
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            closePanels();
+            closeSidebarMenu();
+        }
+    });
+
+    updateSendState();
+})();
+
+</script>
+
+</body>
+</html>

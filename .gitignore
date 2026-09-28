@@ -1,12 +1,43 @@
+# Environment / secrets
 .env
 .env.*
 !.env.example
+
+# Node.js
 node_modules/
+
+# Kivo local database
+kivo.db
+*.db
+*.db-shm
+*.db-wal
+
+# Android / Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+
+# Android generated files
+*.apk
+*.aab
+*.apks
+
+# Signing / certificates
 *.key
 *.pem
 *.p12
 *.keystore
 *.jks
 
-kivo.db
-server.js.before-*
+# Backup / temporary files
+*.before-*
+*.after-*
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Accidental temporary files
+tore --source=*
