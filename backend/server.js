@@ -1,18 +1,68 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const { rateLimit } = require("express-rate-limit");
 const crypto = require("crypto");
 const { DatabaseSync } = require("node:sqlite");
 const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 3000);
 const MODEL = "gemini-3-flash-preview";
 const MAX_MESSAGES = 40;
 const MAX_MEMORY_ITEMS = 100;
+const NODE_ENV = process.env.NODE_ENV || "development";
 
-app.use(cors());
+if (NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+}
+
+app.disable("x-powered-by");
+
+app.use(
+    helmet({
+        crossOriginResourcePolicy: false
+    })
+);
+
+const allowedOrigins = new Set(
+    (process.env.ALLOWED_ORIGINS || "")
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+);
+
+app.use(
+    cors({
+        origin(origin, callback) {
+            if (!origin) return callback(null, true);
+
+            if (NODE_ENV !== "production") {
+                const devOrigins = new Set([
+                    "http://localhost:8080",
+                    "http://127.0.0.1:8080"
+                ]);
+
+                return callback(null, devOrigins.has(origin));
+            }
+
+            return callback(null, allowedOrigins.has(origin));
+        }
+    })
+);
+
 app.use(express.json({ limit: "1mb" }));
+
+const chatRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 30,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        error: "Too many chat requests. Please try again later."
+    }
+});
 
 
 /* =========================
@@ -1520,6 +1570,7 @@ app.post(
 
 app.post(
     "/chat",
+    chatRateLimit,
     async (req, res) => {
 
         let conversationId = "";
