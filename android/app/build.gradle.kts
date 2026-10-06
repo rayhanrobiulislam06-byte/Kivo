@@ -30,5 +30,5 @@ android {
 }
 
 dependencies {
-    implementation("com.google.ai.edge.litertlm:litertlm-android:latest.release")
+    implementation("com.google.ai.edge.litertlm:litertlm-android:0.17.1")
 }

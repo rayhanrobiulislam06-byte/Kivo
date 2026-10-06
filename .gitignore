@@ -41,3 +41,21 @@ Thumbs.db
 
 # Accidental temporary files
 tore --source=*
+
+# Python
+__pycache__/
+*.pyc
+
+# Local runtime backups
+*.backup*
+*.bak
+
+# Large local model files
+*.litertlm
+
+# Local database
+*.db
+
+# Android local/build files
+android/.gradle/
+android/app/build/

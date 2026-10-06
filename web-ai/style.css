@@ -1,0 +1,646 @@
+:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --ink: #1e1e1e;
+    --muted: #696969;
+    --border: #e6e6e8;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    font: inherit;
+    touch-action: manipulation;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.95);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+    flex-shrink: 0;
+}
+
+.icon-button {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button svg,
+.send svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.logo {
+    flex: 1;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.welcome {
+    margin: auto;
+    text-align: center;
+    padding: 8px;
+}
+
+.k-logo {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    border-radius: 24px;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+h1 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.25;
+}
+
+.subtitle {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.chat {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+body.chatting .welcome {
+    display: none;
+}
+
+body.chatting .chat {
+    display: flex;
+}
+
+.bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 20px;
+    font-size: 16px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.bubble.user {
+    align-self: flex-end;
+    background: var(--ink);
+    color: #fff;
+    border-bottom-right-radius: 6px;
+}
+
+.bubble.bot {
+    align-self: flex-start;
+    background: var(--surface);
+    color: var(--ink);
+    border-bottom-left-radius: 6px;
+}
+
+.composer-area {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 8px 16px calc(12px + env(safe-area-inset-bottom));
+}
+
+.composer {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    background: var(--surface);
+    border-radius: 24px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    padding: 0 14px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+}
+
+.send {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 18px;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .15s;
+}
+
+.send:disabled {
+    opacity: .3;
+    cursor: default;
+}
+
+
+/* ===== Kivo Sidebar ===== */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.22);
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.sidebar {
+    position: fixed;
+    z-index: 21;
+    top: 0;
+    left: 0;
+    width: min(320px, 86vw);
+    height: 100%;
+    height: 100dvh;
+    padding: calc(10px + env(safe-area-inset-top)) 12px
+             calc(12px + env(safe-area-inset-bottom));
+    background: var(--bg);
+    box-shadow: 8px 0 30px rgba(0,0,0,.12);
+    transform: translateX(-105%);
+    transition: transform .22s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.sidebar-open .sidebar {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    margin-bottom: 8px;
+}
+
+.sidebar-title {
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.sidebar-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-new-chat {
+    width: 100%;
+    min-height: 52px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--ink);
+    text-align: left;
+    padding: 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar-section {
+    margin-top: 22px;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sidebar-item {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 6px;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    padding: 0 12px;
+    font-size: 15px;
+}
+
+.sidebar-item:active,
+.sidebar-new-chat:active {
+    background: var(--surface);
+}
+
+
+/* ===== Donation Panel ===== */
+.donation-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0,0,0,.22);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.donation-panel.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.donation-card {
+    width: min(720px, 100%);
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px calc(22px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 35px rgba(0,0,0,.15);
+}
+
+.donation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.donation-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.donation-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    font-size: 24px;
+}
+
+.donation-description {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.network-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 7px;
+}
+
+.network-value {
+    font-size: 16px;
+    font-weight: 650;
+    margin-bottom: 14px;
+}
+
+.address-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 6px;
+}
+
+.address-box code {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.copy-address {
+    border: 0;
+    border-radius: 14px;
+    background: var(--ink);
+    color: #fff;
+    padding: 11px 14px;
+    font-size: 14px;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    border-radius: 14px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* ===== Conversations Panel ===== */
+.utility-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 31;
+    background: rgba(0,0,0,.22);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+}
+
+.utility-panel.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.utility-card {
+    width: min(720px, 100%);
+    max-height: 78vh;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px calc(22px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 35px rgba(0,0,0,.15);
+}
+
+.utility-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.utility-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.utility-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    font-size: 24px;
+}
+
+.utility-description {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.conversation-empty {
+    padding: 24px 16px;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--muted);
+    text-align: center;
+    font-size: 15px;
+}
+
+.conversation-current {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--surface);
+    margin-bottom: 10px;
+}
+
+.conversation-current-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.conversation-current-meta {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* ===== Settings ===== */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-row:last-child {
+    border-bottom: 0;
+}
+
+.settings-label {
+    font-weight: 600;
+}
+
+.settings-value {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: right;
+}
+
+
+/* ChatGPT-style conversation history */
+.conversation-card {
+    max-height: 86vh;
+    overflow: hidden;
+}
+
+.conversation-card #conversationList {
+    overflow-y: auto;
+    max-height: calc(86vh - 78px);
+    padding-bottom: 8px;
+}
+
+.conversation-group {
+    margin-top: 18px;
+}
+
+.conversation-group:first-child {
+    margin-top: 4px;
+}
+
+.conversation-group-title {
+    padding: 0 6px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: .55;
+    letter-spacing: .2px;
+}
+
+.conversation-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    margin: 3px 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.conversation-row:hover,
+.conversation-row.current {
+    background: var(--surface, rgba(127,127,127,.10));
+}
+
+.conversation-row-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.conversation-row-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-row-preview {
+    margin-top: 3px;
+    font-size: 12px;
+    opacity: .55;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-row-time {
+    flex: 0 0 auto;
+    font-size: 11px;
+    opacity: .45;
+}
+
+.conversation-empty {
+    padding: 48px 20px;
+    text-align: center;
+    font-size: 14px;
+    opacity: .55;
+}
+
+.conversation-empty-subtitle {
+    margin-top: 7px;
+    font-size: 12px;
+    opacity: .7;
+}
+
+
+/* kivo-repair */
+.conversation-row-actions { flex: 0 0 auto; }
+.conversation-delete {
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 6px 8px;
+}
+.conversation-delete:active { background: var(--surface); }
