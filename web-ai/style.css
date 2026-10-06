@@ -644,3 +644,45 @@ body.sidebar-open .sidebar {
     padding: 6px 8px;
 }
 .conversation-delete:active { background: var(--surface); }
+
+
+/* ---------- On-device AI status ---------- */
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.ai-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9ca3af;
+    flex: 0 0 auto;
+}
+
+.ai-status.connected {
+    color: #374151;
+}
+
+.ai-status.connected .ai-status-dot {
+    background: #22c55e;
+}
+
+.ai-status.offline {
+    color: #6b7280;
+}
+
+.ai-status.offline .ai-status-dot {
+    background: #9ca3af;
+}
+
+@media (max-width: 520px) {
+    .ai-status {
+        font-size: 10px;
+        gap: 4px;
+    }
+}

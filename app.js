@@ -2,6 +2,38 @@
     "use strict";
 
     const API_BASE = "http://127.0.0.1:3001";
+
+    const aiStatus = document.getElementById("aiStatus");
+    const aiStatusText = document.getElementById("aiStatusText");
+
+    async function checkAIStatus() {
+        if (!aiStatus || !aiStatusText) return;
+
+        try {
+            const response = await fetch(API_BASE + "/health", {
+                method: "GET",
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Health check failed");
+            }
+
+            const data = await response.json();
+
+            aiStatus.classList.add("connected");
+            aiStatus.classList.remove("offline");
+            aiStatusText.textContent =
+                data.aiConfigured === false
+                    ? "Gemma 4 E2B"
+                    : "On-device AI";
+        } catch (error) {
+            aiStatus.classList.add("offline");
+            aiStatus.classList.remove("connected");
+            aiStatusText.textContent = "AI offline";
+        }
+    }
+
     const PLACEHOLDER_ADDRESS = "YOUR_TRC20_ADDRESS";
 
     function byId(id) {
@@ -557,4 +589,5 @@
     });
 
     updateSendState();
+    checkAIStatus();
 })();
