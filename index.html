@@ -1,284 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#ffffff">
+<title>Kivo UI Preview</title>
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
-
-    <meta
-        name="theme-color"
-        content="#ffffff"
-    >
-
-    <title>Kivo</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+<link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-<div class="app">
 
-    <!-- TOP BAR -->
+<!-- Kivo Sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <header class="topbar">
-
-        <button
-            id="menuButton"
-            class="icon-button"
-            aria-label="Open menu"
-        >
-            ☰
-        </button>
-
-
-        <div class="logo">
-            Kivo
-        </div>
-
-
-        <button
-            id="newChatButton"
-            class="icon-button"
-            aria-label="New chat"
-        >
-            ＋
-        </button>
-
-    </header>
-
-
-    <!-- CHAT -->
-
-    <main
-        id="chat"
-        class="chat"
-    >
-
-        <div
-            id="welcome"
-            class="welcome"
-        >
-
-            <div class="kivo-icon">
-                K
-            </div>
-
-            <h1>
-                How can I help you?
-            </h1>
-
-        </div>
-
-    </main>
-
-
-    <!-- INPUT -->
-
-    <div class="input-area">
-
-        <div class="input-box">
-
-            <textarea
-    id="messageInput"
-    placeholder="Ask Anything..."
-    rows="1"
-    autocomplete="off"
-    autocorrect="on"
-    autocapitalize="sentences"
-    spellcheck="true"
-    inputmode="text"
-></textarea>
-
-
-            <button
-                id="sendButton"
-                class="send-button"
-                aria-label="Send"
-            >
-                ↑
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- SIDEBAR OVERLAY -->
-
-<div
-    id="sidebarOverlay"
-    class="sidebar-overlay"
-></div>
-
-
-<!-- SIDEBAR -->
-
-<aside
-    id="sidebar"
-    class="sidebar"
->
-
+<aside class="sidebar" id="sidebar" aria-label="Kivo menu">
     <div class="sidebar-header">
-
-        <strong>
-            Kivo
-        </strong>
-
-
-        <button
-            id="closeSidebar"
-            class="icon-button"
-            aria-label="Close menu"
-        >
-            ×
-        </button>
-
+        <div class="sidebar-title">Kivo</div>
+        <button class="sidebar-close" id="closeSidebar" type="button" aria-label="Close menu">×</button>
     </div>
 
-
-    <button
-        id="sidebarNewChat"
-        class="new-chat-button"
-    >
+    <button class="sidebar-new-chat" id="sidebarNewChat" type="button">
         ＋ New Chat
     </button>
 
+    <div class="sidebar-section">Your chats</div>
 
-    
-
-
-    <div
-        id="conversationList"
-        class="conversation-list"
-    ></div>
-
-
-    <button
-        id="donateButton"
-        class="donate-button"
-        type="button"
-    >
-        ❤️ Donate
+    <button class="sidebar-item" type="button" id="historyItem">
+        Conversations
     </button>
 
+    <button class="sidebar-item" type="button" id="featuresItem">
+        ⚙ Features
+    </button>
+
+    <button class="sidebar-item" type="button" id="donationItem">
+        Donation
+    </button>
+
+    <button class="sidebar-item" type="button" id="settingsItem">
+        About
+    </button>
 </aside>
 
+<header class="topbar">
+    <button class="icon-button" id="menu" type="button" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
 
-<!-- DONATION MODAL -->
+    <div class="logo">Kivo</div>
 
-<div
-    id="donationModal"
-    class="donation-modal"
-    aria-hidden="true"
->
+    <button class="icon-button" id="newChat" type="button" aria-label="New chat">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+</header>
 
-    <div
-        class="donation-modal-content"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="donationTitle"
-    >
+<main class="main" id="main">
 
-        <div class="donation-modal-header">
+    <section class="welcome" id="welcome">
+        <div class="k-logo">K</div>
+        <h1>How can I help you?</h1>
+        <div class="subtitle">Ask anything with Kivo.</div>
+    </section>
 
-            <h2 id="donationTitle">
-                ❤️ Support Kivo
-            </h2>
+    <section class="chat" id="chat"></section>
 
-            <button
-                id="closeDonationButton"
-                class="icon-button"
-                type="button"
-                aria-label="Close donation"
-            >
-                ×
-            </button>
+</main>
 
-        </div>
-
-
-        <p class="donation-network">
-            USDT • TRC20
-        </p>
-
-
-        <label
-            class="donation-label"
-            for="donationAmount"
-        >
-            Donation amount
-        </label>
-
+<footer class="composer-area">
+    <form class="composer" id="form" autocomplete="off">
         <input
-            id="donationAmount"
-            class="donation-input"
+            id="message"
             type="text"
-            inputmode="decimal"
-            placeholder="Enter amount"
+            placeholder="Ask anything..."
+            aria-label="Message"
+            enterkeyhint="send"
             autocomplete="off"
+            autocapitalize="sentences"
         >
+        <button class="send" id="send" type="submit" aria-label="Send" disabled>
+            <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+    </form>
+</footer>
 
 
-        <div class="donation-address-section">
-
-            <span class="donation-label">
-                Receiving address
-            </span>
-
-            <div class="donation-address-row">
-
-                <code id="donationAddress">
-                    Wallet address will appear here
-                </code>
-
-                <button
-                    id="copyDonationAddress"
-                    class="donation-copy-button"
-                    type="button"
-                >
-                    Copy
-                </button>
-
-            </div>
-
+<!-- Donation -->
+<div class="donation-panel" id="donationPanel">
+    <div class="donation-card">
+        <div class="donation-header">
+            <div class="donation-title">Support Kivo</div>
+            <button class="donation-close" id="closeDonation" type="button"
+                    aria-label="Close donation">×</button>
         </div>
 
+        <div class="donation-description">
+            If you would like to support Kivo, you can use the supported
+            donation network below.
+        </div>
 
-        <button
-            id="donationContinueButton"
-            class="donation-continue-button"
-            type="button"
-        >
-            Continue
-        </button>
+        <div class="network-label">Network</div>
+        <div class="network-value">USDT (TRC20)</div>
 
-
-        <p
-            id="donationStatus"
-            class="donation-status"
-            aria-live="polite"
-        ></p>
-
+        <div class="network-label">TRC20 Address</div>
+        <div class="address-box">
+            <code id="donationAddress">YOUR_TRC20_ADDRESS</code>
+            <button class="copy-address" id="copyDonationAddress"
+                    type="button">Copy</button>
+        </div>
     </div>
-
 </div>
 
 
+<!-- Conversations -->
+<div class="utility-panel" id="conversationsPanel">
+    <div class="utility-card">
+        <div class="utility-header">
+            <div class="utility-title">Conversations</div>
+            <button class="utility-close" id="closeConversations"
+                    type="button" aria-label="Close conversations">×</button>
+        </div>
+
+        <div class="utility-description">
+            Your current and saved Kivo conversations will appear here.
+        </div>
+
+        <div id="conversationList"></div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="utility-panel" id="featuresPanel">
+    <div class="utility-card">
+        <div class="utility-header">
+            <div class="utility-title">Features</div>
+            <button class="utility-close" id="closeFeatures" type="button" aria-label="Close features">×</button>
+        </div>
+        <div class="utility-description">Kivo features available in this build.</div>
+        <div class="settings-row"><div><div class="settings-label">AI Chat</div></div><div class="settings-value">Enabled</div></div>
+        <div class="settings-row"><div><div class="settings-label">Conversation History</div></div><div class="settings-value">Enabled</div></div>
+        <div class="settings-row"><div><div class="settings-label">SQLite Storage</div></div><div class="settings-value">Enabled</div></div>
+        <div class="settings-row"><div><div class="settings-label">Delete Conversations</div></div><div class="settings-value">Enabled</div></div>
+    </div>
+</div>
+
+<!-- About -->
+<div class="utility-panel" id="settingsPanel">
+    <div class="utility-card">
+        <div class="utility-header">
+            <div class="utility-title">About</div>
+            <button class="utility-close" id="closeSettings"
+                    type="button" aria-label="Close about">×</button>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">App</div>
+            </div>
+            <div class="settings-value">Kivo</div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">Version</div>
+            </div>
+            <div class="settings-value">0.1.0</div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">AI Engine</div>
+            </div>
+            <div class="settings-value">
+                Kivo backend API<br><span id="aboutApiBase">http://127.0.0.1:3001</span>
+            </div>
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <div class="settings-label">Storage</div>
+            </div>
+            <div class="settings-value">Backend SQLite database</div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
 
 </body>
-
 </html>
