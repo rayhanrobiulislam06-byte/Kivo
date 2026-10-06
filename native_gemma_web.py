@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from litert_lm.engine import Engine
+from litert_lm import interfaces
 
 ROOT = Path("/storage/emulated/0/Gemma4Chatbot")
 DB = ROOT / "kivo.db"
@@ -189,7 +190,11 @@ def get_gemma_conversation(conversation_id):
     if conversation is not None:
         return conversation
 
-    conversation = engine.create_conversation()
+    # After a server restart, create a fresh native conversation.
+    # Persistent DB history is injected into the first post-restart prompt.
+    conversation = engine.create_conversation(
+        max_output_tokens=1024,
+    )
 
     conversations[conversation_id] = conversation
 
@@ -200,8 +205,39 @@ def generate(message, conversation_id):
     with gemma_lock:
         conversation = get_gemma_conversation(conversation_id)
 
+        db_messages = get_messages(conversation_id)
+
+        # The current user message is already saved by /chat.
+        # Exclude it so it is sent only once below.
+        history = db_messages[:-1] if db_messages else []
+
+        if history:
+            lines = [
+                "Previous conversation history:",
+            ]
+
+            for item in history[-40:]:
+                role = item.get("type")
+                text = str(item.get("text", "")).strip()
+
+                if not text:
+                    continue
+
+                if role == "user":
+                    lines.append("User: " + text)
+                elif role == "bot":
+                    lines.append("Assistant: " + text)
+
+            lines.append("")
+            lines.append("Current user message:")
+            lines.append(message)
+
+            prompt = "\n".join(lines)
+        else:
+            prompt = message
+
         result = conversation.send_message(
-            message,
+            prompt,
             max_output_tokens=1024,
         )
 
@@ -213,7 +249,6 @@ def generate(message, conversation_id):
             )
 
         return reply
-
 
 class Handler(BaseHTTPRequestHandler):
 
