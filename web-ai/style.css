@@ -648,17 +648,22 @@ body.sidebar-open .sidebar {
 
 /* ---------- On-device AI status ---------- */
 .ai-status {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
+    padding: 4px 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #f9fafb;
+    font-size: 10px;
+    line-height: 1;
     color: #6b7280;
     white-space: nowrap;
 }
 
 .ai-status-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #9ca3af;
     flex: 0 0 auto;
@@ -666,6 +671,8 @@ body.sidebar-open .sidebar {
 
 .ai-status.connected {
     color: #374151;
+    border-color: #dcfce7;
+    background: #f0fdf4;
 }
 
 .ai-status.connected .ai-status-dot {
@@ -674,6 +681,8 @@ body.sidebar-open .sidebar {
 
 .ai-status.offline {
     color: #6b7280;
+    border-color: #e5e7eb;
+    background: #f9fafb;
 }
 
 .ai-status.offline .ai-status-dot {

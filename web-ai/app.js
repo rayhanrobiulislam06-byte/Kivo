@@ -23,14 +23,15 @@
 
             aiStatus.classList.add("connected");
             aiStatus.classList.remove("offline");
+
             aiStatusText.textContent =
                 data.aiConfigured === false
-                    ? "Gemma 4 E2B"
+                    ? "Gemma 4 E2B • On-device"
                     : "On-device AI";
         } catch (error) {
             aiStatus.classList.add("offline");
             aiStatus.classList.remove("connected");
-            aiStatusText.textContent = "AI offline";
+            aiStatusText.textContent = "AI offline • Start Kivo";
         }
     }
 
@@ -590,4 +591,5 @@
 
     updateSendState();
     checkAIStatus();
+    setInterval(checkAIStatus, 10000);
 })();
