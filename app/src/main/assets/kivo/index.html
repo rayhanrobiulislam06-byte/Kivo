@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kivo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button id="menuButton" class="icon-btn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <h1 class="brand">Kivo</h1>
+    <button id="newChatButton" class="icon-btn" aria-label="New chat">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </header>
+  <main id="chat" class="chat" aria-live="polite"></main>
+  <footer class="composer-wrap">
+    <div class="composer">
+      <button id="composerPlus" class="icon-btn small" aria-label="Add">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <textarea id="messageInput" rows="1" placeholder="Ask Anything..." aria-label="Message"></textarea>
+      <button id="sendButton" class="send-btn" aria-label="Send message" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<div id="sidebarOverlay" class="overlay"></div>
+<aside id="sidebar" class="sidebar" aria-hidden="true">
+  <div class="sidebar-head">
+    <span class="brand">Kivo</span>
+    <button id="closeSidebar" class="icon-btn" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <button id="sidebarNewChat" class="btn btn-soft">+ New Chat</button>
+  <div class="sidebar-label">Recent</div>
+  <nav id="conversationList" class="conv-list"></nav>
+  <button id="filesButton" class="btn btn-soft support-btn">📁 FileNest</button>
+  <button id="backupButton" class="btn btn-soft support-btn">💾 Backup &amp; restore</button>
+  <button id="donateButton" class="btn btn-soft support-btn">❤️ Support Kivo</button>
+  <div id="appVersion" class="app-version"></div>
+</aside>
+
+<section id="setupScreen" class="setup" data-state="missing">
+  <div class="setup-card">
+    <div class="setup-brand">Kivo</div>
+    <div class="setup-model">Gemma 4 E2B<br><span>On-device AI</span></div>
+    <p id="setupText" class="setup-text">Run Kivo privately on your device.</p>
+    <div id="progressWrap" class="progress" hidden><div id="progressBar" class="progress-bar"></div></div>
+    <div id="progressLabel" class="progress-label" hidden></div>
+    <button id="setupButton" class="btn btn-primary">Download Gemma 4 E2B</button>
+    <button id="setupAltButton" class="setup-alt" type="button" hidden>I already have the model file</button>
+  </div>
+</section>
+
+<div id="donationModal" class="dn-modal" aria-hidden="true">
+  <div class="dn-sheet" role="dialog" aria-modal="true" aria-labelledby="dnTitle">
+    <div class="dn-grab"></div>
+    <button id="closeDonationButton" class="dn-close icon-btn" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="dn-hero">
+      <div class="dn-heart">❤️</div>
+      <h2 id="dnTitle">Support Kivo</h2>
+      <p>Kivo is free, private and runs fully on your phone. Your support helps it keep improving.</p>
+    </div>
+    <div class="dn-net"><span class="dn-dot"></span>USDT · TRON (TRC20)</div>
+    <div class="dn-chips" role="group" aria-label="Suggested amount">
+      <button type="button" class="dn-chip" data-amt="1">1</button>
+      <button type="button" class="dn-chip" data-amt="5">5</button>
+      <button type="button" class="dn-chip" data-amt="10">10</button>
+      <button type="button" class="dn-chip" data-amt="25">25</button>
+    </div>
+    <div id="donationQrBox" class="dn-qr" hidden>
+      <img id="donationQr" alt="QR code of the wallet address" width="160" height="160">
+    </div>
+    <div class="dn-addr-card">
+      <div class="dn-label">Wallet address</div>
+      <code id="donationAddress"></code>
+    </div>
+    <button id="copyDonationAddress" class="dn-copy" type="button">Copy address</button>
+    <p class="dn-warn">Send only USDT on the TRON (TRC20) network. Other coins or networks may be lost permanently.</p>
+    <p id="donationStatus" class="dn-status" aria-live="polite"></p>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="memory.js"></script>
+<script src="kivo-ux.js"></script>
+<script src="kivo-backup.js"></script>
+</body>
+</html>

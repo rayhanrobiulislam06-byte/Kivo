@@ -1,9 +1,55 @@
-# Kivo
+# Kivo v1.0.0
 
-A private AI chat app for Android. Kivo runs Gemma 4 E2B on your phone. No account and no API key needed. Internet is used only once, to download the model; chats and memories stay on your device.
+Private, offline AI chat for Android (Gemma 4 E2B on-device via LiteRT-LM) with the **FileNest** file
+manager and soft-skills hub built in. Everything runs on the phone. After the one-time model download
+nothing leaves the device.
 
-**[Download the latest version](https://github.com/rayhanrobiulislam06-byte/Kivo/releases/latest)**
+## What is in this repository
 
-- AI Memory, streaming replies with Stop, multiple chats
-- Automatic model download on first launch (about 2.6 GB)
-- Requires Android 7.0+, 64-bit phone, 6 GB RAM recommended
+| Path | What it is |
+| --- | --- |
+| `app/src/main/java/com/kivo/app/MainActivity.kt` | WebView host + the `KivoNative` JavaScript bridge, model download/import, chat, Save-as |
+| `.../ModelDownloader.kt` | Resumable download (HTTP Range, retries, SHA-256 check) |
+| `.../ai/KivoChatEngine.kt` | LiteRT-LM engine wrapper (streaming, stop, reset) |
+| `.../KeepAliveService.kt` | Foreground service while downloading / loading / answering |
+| `.../KivoState.kt` | Process-wide state so a running reply survives a page reload |
+| `app/src/main/assets/kivo/` | The chat UI (HTML/CSS/JS), memory, backup & restore, setup-screen helpers |
+| `filenest/` | FileNest source (React + TypeScript + Vite). Built into `assets/kivo/filenest/` |
+| `tools/` | `build-web.sh`, `sign.sh`, `make-key.sh` |
+
+The web part and the native part talk through `window.KivoNative`:
+`isReady, isLoading, isDownloading, getPartialBytes, isMetered, downloadModel, pauseDownload, pickModel,
+sendMessage(text,id), stop, newChat, getPending, clearPending, getVersion, saveFile(name,mime,base64), setBarColor`.
+Native calls back with `kivoNativeChunk(id,text)` (deltas), `kivoNativeResponse(id,text,error)`,
+`kivoNativeSetup`, `kivoNativeReady`, `kivoModelDownload(state,done,total,msg)`, `kivoModelProgress`,
+`kivoModelInstallFailed`. The bridge only answers pages under `file:///android_asset/kivo/`.
+
+## Build (Termux, no computer needed)
+
+```
+bash tools/make-key.sh        # once. Writes ~/kivo-release.jks and a backup. WRITE THE PASSWORD DOWN
+bash tools/build-web.sh       # builds FileNest into the app assets
+./gradlew assembleRelease     # first run downloads Gradle + dependencies
+bash tools/sign.sh            # -> /storage/emulated/0/Download/Kivo-1.0.0.apk
+```
+
+`gradle.properties` points AAPT2 at Termux's `aapt2`. On a PC, delete that line.
+
+### বাংলায় সংক্ষেপে
+১. `bash tools/build-web.sh` (FileNest তৈরি) ২. `./gradlew assembleRelease` ৩. `bash tools/sign.sh`।
+সাইনিং কী (`~/kivo-release.jks`) কখনো হারাবেন না, নইলে আপডেট ইনস্টল হবে না।
+
+## Upgrading
+
+* Package id stays `com.kivo.app`, version code 10000.
+* A phone with **Kivo-FileNest.apk** (signed with `~/kivo-release.jks`) updates in place; chats and the model stay.
+* The very first v0.1.7 release was signed with a lost key: uninstall it first (chats and model are removed).
+* Inside the app: sidebar -> *Backup & restore* exports chats, memory and settings to a JSON file.
+
+## Status / honest notes
+
+* The native Kotlin code was written without an Android SDK available and has **not been compiled or run yet**.
+  Build it, and send any compiler or crash message back: they are expected to be small.
+* `maxNumTokens` is 2048 (the first prototype used 1024). Lower it in `KivoChatEngine.kt` if a phone runs out of memory.
+* Stop uses `Conversation.cancelProcess()` through reflection and falls back to resetting the conversation.
+* Minimum Android version is 8.0 (API 26); the adaptive icon is a simple "K" and can be replaced.

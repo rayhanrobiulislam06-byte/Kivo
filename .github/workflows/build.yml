@@ -1,0 +1,26 @@
+name: Build Kivo APK
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build FileNest into the app
+        run: bash tools/build-web.sh
+      - name: Build release APK
+        run: |
+          sed -i '/aapt2FromMavenOverride/d' gradle.properties
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kivo-1.0.0-unsigned
+          path: app/build/outputs/apk/release/app-release-unsigned.apk

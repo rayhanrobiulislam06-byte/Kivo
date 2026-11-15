@@ -1,61 +1,10 @@
-# Environment / secrets
-.env
-.env.*
-!.env.example
-
-# Node.js
-node_modules/
-
-# Kivo local database
-kivo.db
-*.db
-*.db-shm
-*.db-wal
-
-# Android / Gradle
 .gradle/
-**/.gradle/
 build/
-**/build/
 local.properties
-
-# Android generated files
-*.apk
-*.aab
-*.apks
-
-# Signing / certificates
-*.key
-*.pem
-*.p12
-*.keystore
 *.jks
-
-# Backup / temporary files
-*.before-*
-*.after-*
-
-# OS / editor files
-.DS_Store
-Thumbs.db
-
-# Accidental temporary files
-tore --source=*
-
-# Python
-__pycache__/
-*.pyc
-
-# Local runtime backups
-*.backup*
-*.bak
-
-# Large local model files
-*.litertlm
-
-# Local database
-*.db
-
-# Android local/build files
-android/.gradle/
-android/app/build/
+*.keystore
+*.apk
+node_modules/
+filenest/dist/
+filenest/dist-kivo/
+app/src/main/assets/kivo/filenest/
