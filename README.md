@@ -39,6 +39,16 @@ bash tools/sign.sh            # -> /storage/emulated/0/Download/Kivo-1.0.0.apk
 ১. `bash tools/build-web.sh` (FileNest তৈরি) ২. `./gradlew assembleRelease` ৩. `bash tools/sign.sh`।
 সাইনিং কী (`~/kivo-release.jks`) কখনো হারাবেন না, নইলে আপডেট ইনস্টল হবে না।
 
+## Model download link
+
+The model is Google's Gemma 4 E2B in LiteRT-LM format, hosted by the LiteRT community on Hugging Face (pinned to one
+exact revision, checked by SHA-256 inside the app). One-tap link:
+
+`https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/3d48132a00cf76de57d926de30f5c5c5ed9b8c0d/gemma-4-E2B-it.litertlm`
+
+Open it in a browser (it downloads the 2.6 GB file), then in Kivo tap *I already have the model file* and choose it.
+The setup screen shows the same link as "download in your browser". The file is not hosted in this repository.
+
 ## Upgrading
 
 * Package id stays `com.kivo.app`, version code 10000.

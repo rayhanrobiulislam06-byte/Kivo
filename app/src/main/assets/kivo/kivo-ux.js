@@ -36,6 +36,17 @@
     error: "Tap Try again, the download continues where it stopped. If it keeps failing, get the model file another way and use \u201cI already have the model file\u201d."
   };
 
+  // Browser download link (one tap): the browser downloads the model file, then "I already have the model file" installs it.
+  var MODEL_LINK = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/3d48132a00cf76de57d926de30f5c5c5ed9b8c0d/gemma-4-E2B-it.litertlm";
+  var alt = document.getElementById("setupAltButton");
+  var link = document.createElement("a");
+  link.href = MODEL_LINK; link.target = "_blank"; link.rel = "noopener"; link.hidden = true;
+  link.style.cssText = "display:block;margin:14px 8px 0;font-size:13px;line-height:1.5;text-align:center;text-decoration:underline;opacity:.85;color:inherit";
+  link.innerHTML = "Slow or interrupted? Download the model file in your browser (2.6 GB), then tap \u201cI already have the model file\u201d.<br>" +
+    "\u09a7\u09c0\u09b0 \u09ac\u09be \u09ac\u09be\u09a7\u09be\u0997\u09cd\u09b0\u09b8\u09cd\u09a4 \u09b9\u09b2\u09c7 \u09ac\u09cd\u09b0\u09be\u0989\u099c\u09be\u09b0\u09c7 \u09ae\u09a1\u09c7\u09b2 \u09ab\u09be\u0987\u09b2 \u09a8\u09be\u09ae\u09be\u09a8\u0964";
+  if (alt && alt.parentNode) alt.parentNode.insertBefore(link, alt.nextSibling); else note.parentNode.insertBefore(link, note.nextSibling);
+  var LINK_STATES = { missing: 1, paused: 1, error: 1 };
+
   var samples = [], lock = null, lastState = "";
   function state() { return scr.getAttribute("data-state") || ""; }
 
@@ -60,6 +71,7 @@
   function onState() {
     var s = state();
     note.textContent = NOTES[s] || ""; note.hidden = !NOTES[s];
+    link.hidden = !LINK_STATES[s];
     if (s !== "downloading") { samples = []; speed.hidden = true; speed.textContent = ""; }
     if (s === "downloading") holdLock(); else releaseLock();
     lastState = s;

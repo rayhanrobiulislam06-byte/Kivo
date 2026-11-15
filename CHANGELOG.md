@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.0 (setup screen)
+- Setup screen offers a one-tap browser download link for the model file.
+
 ## 1.0.0 (faster download)
 - The model downloads over 8 parallel connections (about as fast as aria2c). Pause, resume, app restarts and
   network drops continue per segment; an old single-connection partial download is picked up automatically.
