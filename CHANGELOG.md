@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0 (hardening after review)
+- Imported model is checked by exact size and SHA-256 and replaced safely (the old one is restored on failure).
+- Download resume validates the server's Content-Range; start/pause can no longer race or start twice.
+- Only one reply can run at a time; the next reply waits for a stopped one to finish.
+- Android cloud backup is off; use the in-app JSON backup.
+- Every http(s) request inside the WebView is blocked; message and save-file sizes are limited.
+- FileNest refuses zip bombs (entry count and size limits).
+
 ## 1.0.0
 - Complete source code of the app (the v0.1.7 native source was lost; rebuilt from the APK's interface).
 - New: FileNest file manager and soft-skills hub inside Kivo (sidebar -> FileNest).

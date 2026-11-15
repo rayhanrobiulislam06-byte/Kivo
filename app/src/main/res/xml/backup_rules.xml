@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<full-backup-content>
-    <!-- the 2.6 GB model is never backed up; chats and memory (WebView storage) are small -->
-    <exclude domain="file" path="models" />
-</full-backup-content>

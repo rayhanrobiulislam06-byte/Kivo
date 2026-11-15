@@ -24,6 +24,7 @@ import android.webkit.RenderProcessGoneDetail
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -31,6 +32,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import com.kivo.app.ai.KivoChatEngine
 import org.json.JSONObject
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -157,6 +159,14 @@ class MainActivity : Activity() {
                     }
                 }
                 return true                                     // nothing else is ever loaded in this view
+            }
+
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+                val scheme = request.url.scheme
+                if (scheme == "http" || scheme == "https") {
+                    return WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
+                }
+                return null
             }
 
             override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
@@ -307,7 +317,8 @@ class MainActivity : Activity() {
         "window.kivoModelDownload && window.kivoModelDownload('$state', $done, $total, ${q(msg)})"
 
     private fun startModelDownload() {
-        if (downloader.isRunning || KivoState.copyingModel || KivoState.engineLoading) return
+        if (KivoState.copyingModel || KivoState.engineLoading) return
+        if (!downloader.tryBegin()) return
         requestNotificationPermission()
         startService("Downloading Gemma 4 E2B…")
         val part = downloader.partFile(modelsDir)
@@ -373,6 +384,9 @@ class MainActivity : Activity() {
                 if (size in 0 until ModelConfig.MIN_PICKED_BYTES) {
                     throw IOException("That file is too small to be the Gemma 4 E2B model.")
                 }
+                if (size > 0 && size != ModelConfig.TOTAL_BYTES) {
+                    throw IOException("That file is not the Gemma 4 E2B model (its size is different).")
+                }
                 val need = (if (size > 0) size else ModelConfig.TOTAL_BYTES) + ModelConfig.FREE_SPACE_MARGIN
                 if (modelsDir.usableSpace < need) {
                     throw IOException("Not enough free storage. Free up about ${need / (1024L * 1024L * 1024L) + 1} GB and try again.")
@@ -397,13 +411,22 @@ class MainActivity : Activity() {
                         out.fd.sync()
                     }
                 }
-                if (modelFile.exists()) modelFile.delete()
-                if (!tmp.renameTo(modelFile)) {
-                    current?.postJs("window.kivoModelInstallFailed && window.kivoModelInstallFailed('Could not finalize model file')")
-                } else {
-                    downloader.partFile(modelsDir).delete()
-                    current?.initializeEngine(modelFile)
+                current?.postJs(downloadJs("verifying", 0, 0, ""))
+                val digest = downloader.sha256Of(tmp)
+                if (!digest.equals(ModelConfig.SHA256, ignoreCase = true)) {
+                    throw IOException("The file is damaged or is not the Gemma 4 E2B model.")
                 }
+                val backup = File(modelsDir, ModelConfig.NAME + ".old")
+                backup.delete()
+                val hadOld = modelFile.exists()
+                if (hadOld && !modelFile.renameTo(backup)) throw IOException("Could not replace the existing model")
+                if (!tmp.renameTo(modelFile)) {
+                    if (hadOld) backup.renameTo(modelFile)   // roll back: the old model keeps working
+                    throw IOException("Could not finalize model file")
+                }
+                backup.delete()
+                downloader.partFile(modelsDir).delete()
+                current?.initializeEngine(modelFile)
             } catch (t: Throwable) {
                 tmp.delete()
                 current?.postJs(
@@ -430,6 +453,10 @@ class MainActivity : Activity() {
     }
 
     private fun sendMessage(text: String, id: String) {
+        if (text.length > 100_000) {
+            current?.postJs("window.kivoNativeResponse && window.kivoNativeResponse(${q(id)}, '', 'The message is too long')")
+            return
+        }
         val engine = KivoState.engine
         if (!KivoState.engineReady || engine == null) {
             current?.postJs("window.kivoNativeResponse && window.kivoNativeResponse(${q(id)}, '', 'MODEL_NOT_READY')")
@@ -445,6 +472,11 @@ class MainActivity : Activity() {
         startService("Kivo is thinking…")
         worker.execute {
             try {
+                var waited = 0
+                while (engine.isGenerating && waited < 3000) {   // a stopped reply may still be winding down
+                    Thread.sleep(100)
+                    waited += 100
+                }
                 engine.sendMessageStream(text, object : KivoChatEngine.StreamCallback {
                     override fun onChunk(text: String) {
                         KivoState.appendPending(text)
@@ -486,7 +518,7 @@ class MainActivity : Activity() {
     private fun saveFile(name: String, mime: String, base64: String) {
         longTasks.execute {
             try {
-                if (base64.length > 200_000_000) throw IOException("File too large")
+                if (base64.length > 80_000_000) throw IOException("File too large")
                 val bytes = Base64.decode(base64, Base64.DEFAULT)
                 val tmp = File(cacheDir, "pending-save.bin")
                 tmp.writeBytes(bytes)

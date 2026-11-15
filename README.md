@@ -45,6 +45,14 @@ bash tools/sign.sh            # -> /storage/emulated/0/Download/Kivo-1.0.0.apk
 * A phone with **Kivo-FileNest.apk** (signed with `~/kivo-release.jks`) updates in place; chats and the model stay.
 * The very first v0.1.7 release was signed with a lost key: uninstall it first (chats and model are removed).
 * Inside the app: sidebar -> *Backup & restore* exports chats, memory and settings to a JSON file.
+* Android cloud backup is switched **off** (`allowBackup=false`): chats never leave the phone unless you export them yourself.
+
+## Security notes
+
+* The bridge only answers while the main page is one of Kivo's own assets, no remote page is ever loaded in the
+  WebView and every `http(s)` request made by a page is blocked; links open in the browser instead.
+* Imported models must have the exact size and SHA-256 of Gemma 4 E2B; a broken import never replaces a working model.
+* ZIP files opened in FileNest are limited to 5000 entries / 500 MB and unsafe paths (`..`, absolute) are skipped.
 
 ## Status / honest notes
 

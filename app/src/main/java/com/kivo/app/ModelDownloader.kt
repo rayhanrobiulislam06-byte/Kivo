@@ -28,15 +28,26 @@ class ModelDownloader {
     var isRunning = false
         private set
 
+    /** Atomically claims the downloader; false when a download is already running. Clears an old pause request. */
+    @Synchronized
+    fun tryBegin(): Boolean {
+        if (isRunning) return false
+        isRunning = true
+        stopRequested = false
+        return true
+    }
+
     fun pause() {
         stopRequested = true
     }
 
+    /** SHA-256 of a file, not cancellable (used to check an imported model). */
+    fun sha256Of(file: File): String = sha256(file, false)
+
     fun partFile(dir: File): File = File(dir, ModelConfig.NAME + ".part")
 
+    /** Call tryBegin() first. */
     fun download(dir: File, listener: Listener): File {
-        isRunning = true
-        stopRequested = false
         try {
             return run(dir, listener)
         } finally {
@@ -69,7 +80,7 @@ class ModelDownloader {
         }
 
         listener.onVerifying()
-        val digest = sha256(part)
+        val digest = sha256(part, true)
         if (!digest.equals(ModelConfig.SHA256, ignoreCase = true)) {
             part.delete()
             throw DownloadException("The downloaded file is damaged. Please download it again.")
@@ -123,6 +134,19 @@ class ModelDownloader {
                     c.disconnect()
                     throw DownloadException("Server error $code")
                 }
+                if (code == 206) {
+                    val range = c.getHeaderField("Content-Range") ?: ""
+                    val m = Regex("bytes (\\d+)-(\\d+)/(\\d+|\\*)").find(range)
+                    if (m == null || m.groupValues[1].toLong() != start) {
+                        // the server answered a different range than we asked for: never append it
+                        c.disconnect()
+                        failures++
+                        if (failures > 5) throw DownloadException("The server sent an unexpected data range. Please try again later.")
+                        part.delete()
+                        start = 0L
+                        continue
+                    }
+                }
                 val from = if (code == 206) start else 0L
                 RandomAccessFile(part, "rw").use { raf ->
                     if (from == 0L) raf.setLength(0L)
@@ -162,12 +186,12 @@ class ModelDownloader {
         }
     }
 
-    private fun sha256(file: File): String {
+    private fun sha256(file: File, cancellable: Boolean): String {
         val md = MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
             val buf = ByteArray(1 shl 20)
             while (true) {
-                if (stopRequested) throw CancelledException()
+                if (cancellable && stopRequested) throw CancelledException()
                 val n = input.read(buf)
                 if (n < 0) break
                 md.update(buf, 0, n)

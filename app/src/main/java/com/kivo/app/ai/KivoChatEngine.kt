@@ -54,14 +54,29 @@ class KivoChatEngine(modelPath: String) {
     fun isInitialized(): Boolean = engine.isInitialized()
 
     fun sendMessageStream(message: String, callback: StreamCallback) {
-        if (needsReset) resetConversation()
+        if (needsReset && !isGenerating) resetConversation()
         val conv = conversation
         if (conv == null) {
             callback.onError("MODEL_NOT_READY")
             return
         }
+        synchronized(this) {
+            if (isGenerating) {
+                callback.onError("Kivo is still finishing the previous reply")
+                return
+            }
+            isGenerating = true
+        }
         cancelled = false
-        isGenerating = true
+        try {
+            startStream(conv, message, callback)
+        } catch (t: Throwable) {
+            isGenerating = false
+            callback.onError(t.message ?: "Unknown model error")
+        }
+    }
+
+    private fun startStream(conv: Conversation, message: String, callback: StreamCallback) {
         conv.sendMessageAsync(
             message,
             object : MessageCallback {
@@ -104,6 +119,11 @@ class KivoChatEngine(modelPath: String) {
         while (isGenerating && waited < 4000) {
             Thread.sleep(100)
             waited += 100
+        }
+        if (isGenerating) {
+            // never close a conversation that is still producing text: try again before the next message
+            needsReset = true
+            return
         }
         val old = conversation
         conversation = null

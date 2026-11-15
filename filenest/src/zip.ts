@@ -17,8 +17,22 @@ export async function makeZip(ids: string[]) {
   if (!Object.keys(out).length) throw new Error('Nothing to compress')
   return new Blob([zipSync(out, { level: 6 }) as BlobPart], { type: 'application/zip' })
 }
+const MAX_ENTRIES = 5000
+const MAX_TOTAL = 500 * 1024 * 1024
+const MAX_ENTRY = 300 * 1024 * 1024
+// refuses zip bombs before anything is decompressed into memory
+function unzipLimited(data: Uint8Array) {
+  let n = 0, total = 0
+  return unzipSync(data, {
+    filter: (f) => {
+      n++; total += f.originalSize
+      if (n > MAX_ENTRIES || total > MAX_TOTAL || f.originalSize > MAX_ENTRY) throw new Error('ZIP is too large or has too many files')
+      return true
+    },
+  })
+}
 export async function listZip(blob: Blob) {
-  const files = unzipSync(new Uint8Array(await blob.arrayBuffer()))
+  const files = unzipLimited(new Uint8Array(await blob.arrayBuffer()))
   return Object.entries(files).filter(([p]) => !p.endsWith('/')).map(([name, d]) => ({ name, size: d.length }))
 }
 function safePath(p: string): string | null {
@@ -28,7 +42,7 @@ function safePath(p: string): string | null {
   return parts.join('/')
 }
 export async function extractZip(node: db.Node, pid: string) {
-  const files = unzipSync(new Uint8Array(await node.blob!.arrayBuffer()))
+  const files = unzipLimited(new Uint8Array(await node.blob!.arrayBuffer()))
   const base = node.name.replace(/\.zip$/i, '') || 'extracted'
   const dest = (await db.mkdir(pid, base)).id
   let extracted = 0, skipped = 0
