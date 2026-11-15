@@ -321,8 +321,7 @@ class MainActivity : Activity() {
         if (!downloader.tryBegin()) return
         requestNotificationPermission()
         startService("Downloading Gemma 4 E2B…")
-        val part = downloader.partFile(modelsDir)
-        postJs(downloadJs("start", if (part.exists()) part.length() else 0L, ModelConfig.TOTAL_BYTES, ""))
+        postJs(downloadJs("start", downloader.partialBytes(modelsDir), ModelConfig.TOTAL_BYTES, ""))
         longTasks.execute {
             try {
                 val file = downloader.download(modelsDir, object : ModelDownloader.Listener {
@@ -336,8 +335,7 @@ class MainActivity : Activity() {
                 })
                 current?.initializeEngine(file)
             } catch (e: ModelDownloader.CancelledException) {
-                val p = downloader.partFile(modelsDir)
-                current?.postJs(downloadJs("paused", if (p.exists()) p.length() else 0L, ModelConfig.TOTAL_BYTES, ""))
+                current?.postJs(downloadJs("paused", downloader.partialBytes(modelsDir), ModelConfig.TOTAL_BYTES, ""))
             } catch (e: ModelDownloader.DownloadException) {
                 current?.postJs(downloadJs("error", 0, 0, e.message ?: "Download failed"))
             } catch (t: Throwable) {
@@ -425,7 +423,7 @@ class MainActivity : Activity() {
                     throw IOException("Could not finalize model file")
                 }
                 backup.delete()
-                downloader.partFile(modelsDir).delete()
+                downloader.clearPartial(modelsDir)
                 current?.initializeEngine(modelFile)
             } catch (t: Throwable) {
                 tmp.delete()
@@ -597,8 +595,7 @@ class MainActivity : Activity() {
 
         @JavascriptInterface
         fun getPartialBytes(): Long {
-            val p = downloader.partFile(modelsDir)
-            return if (p.exists()) p.length() else 0L
+            return downloader.partialBytes(modelsDir)
         }
 
         @JavascriptInterface

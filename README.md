@@ -9,7 +9,7 @@ nothing leaves the device.
 | Path | What it is |
 | --- | --- |
 | `app/src/main/java/com/kivo/app/MainActivity.kt` | WebView host + the `KivoNative` JavaScript bridge, model download/import, chat, Save-as |
-| `.../ModelDownloader.kt` | Resumable download (HTTP Range, retries, SHA-256 check) |
+| `.../ModelDownloader.kt` | Parallel (8 x HTTP Range) resumable download with retries and SHA-256 check |
 | `.../ai/KivoChatEngine.kt` | LiteRT-LM engine wrapper (streaming, stop, reset) |
 | `.../KeepAliveService.kt` | Foreground service while downloading / loading / answering |
 | `.../KivoState.kt` | Process-wide state so a running reply survives a page reload |

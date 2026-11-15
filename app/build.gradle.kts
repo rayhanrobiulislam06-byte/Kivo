@@ -11,7 +11,7 @@ android {
         applicationId = "com.kivo.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10002          // 1.0.0 -> major*10000 + minor*100 + patch
+        versionCode = 10003          // 1.0.0 -> major*10000 + minor*100 + patch
         versionName = "1.0.0"
     }
 

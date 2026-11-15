@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 (faster download)
+- The model downloads over 8 parallel connections (about as fast as aria2c). Pause, resume, app restarts and
+  network drops continue per segment; an old single-connection partial download is picked up automatically.
+
 ## 1.0.0 (hardening after review)
 - Imported model is checked by exact size and SHA-256 and replaced safely (the old one is restored on failure).
 - Download resume validates the server's Content-Range; start/pause can no longer race or start twice.
