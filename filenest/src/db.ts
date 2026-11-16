@@ -4,6 +4,7 @@ export const ROOT = 'root'
 const dbp = openDB('filenest', 1, {
   upgrade(d) { const s = d.createObjectStore('nodes', { keyPath: 'id' }); s.createIndex('parent', 'parentId') },
 })
+dbp.catch((e) => console.error('[FileNest] IndexedDB could not be opened:', e))
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10)
 
 const EXT: Record<string, string[]> = {

@@ -51,6 +51,7 @@ export async function saveBlob(name: string, blob: Blob): Promise<boolean> {
   const bytes = new Uint8Array(await blob.arrayBuffer())
   let bin = ""
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  console.log('[FileNest] saveFile ' + name + ' (' + bytes.length + ' bytes)')
   n.saveFile(name, blob.type || "application/octet-stream", btoa(bin))
   return true
 }

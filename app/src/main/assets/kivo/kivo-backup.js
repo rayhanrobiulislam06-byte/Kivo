@@ -71,6 +71,10 @@
       '<button id="bkExport" class="btn btn-primary">Export backup</button>' +
       '<button id="bkImport" class="btn btn-soft">Import backup (replaces current chats)</button>' +
       '<input id="bkFile" type="file" accept="application/json,.json" style="display:none">' +
+      '<button id="bkLog" class="btn btn-soft">Show debug log</button>' +
+      '<textarea id="bkLogText" readonly rows="9" style="display:none;width:100%;font-size:11px;font-family:monospace;' +
+      'background:transparent;color:inherit;border:1px solid currentColor;border-radius:10px;padding:8px"></textarea>' +
+      '<button id="bkCopy" class="btn btn-soft" style="display:none">Copy log</button>' +
       '<button id="bkClose" class="btn btn-soft">Close</button>';
     overlay.appendChild(sheet);
     overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
@@ -78,6 +82,20 @@
     var armed = false, imp = sheet.querySelector("#bkImport"), file = sheet.querySelector("#bkFile");
     sheet.querySelector("#bkExport").addEventListener("click", exportIt);
     sheet.querySelector("#bkClose").addEventListener("click", close);
+    var logBox = sheet.querySelector("#bkLogText"), copyBtn = sheet.querySelector("#bkCopy");
+    sheet.querySelector("#bkLog").addEventListener("click", function () {
+      var t = "";
+      try { t = window.KivoNative && window.KivoNative.getLog ? window.KivoNative.getLog() : ""; } catch (e) {}
+      logBox.value = t || "(empty)";
+      logBox.style.display = "block"; copyBtn.style.display = "block";
+      logBox.scrollTop = logBox.scrollHeight;
+    });
+    copyBtn.addEventListener("click", function () {
+      logBox.focus(); logBox.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      toast(ok ? "Log copied" : "Long-press the text and choose Copy");
+    });
     imp.addEventListener("click", function () {
       if (!armed) { armed = true; imp.textContent = "Tap again to choose the backup file"; return; }
       file.click();

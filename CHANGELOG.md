@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 (diagnostics)
+- Backup & restore -> *Show debug log*: last WebView console / native events, to find problems on a real phone.
+- FileNest errors stay visible longer and are written to that log; IndexedDB is enabled explicitly.
+
 ## 1.0.0 (setup screen)
 - Setup screen offers a one-tap browser download link for the model file.
 

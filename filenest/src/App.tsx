@@ -48,7 +48,7 @@ function Main() {
   const [pick, setPick] = useState<'copy' | 'move' | null>(null)
   const [est, setEst] = useState<{ usage?: number; quota?: number }>({})
 
-  const toast = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3000) }
+  const toast = (m: string, ms = 3000) => { setMsg(m); setTimeout(() => setMsg(''), ms) }
   const refresh = useCallback(async () => setNodes(await db.all()), [])
   useEffect(() => { refresh() }, [refresh])
   useEffect(() => { if (tab === 'home') navigator.storage?.estimate?.().then(setEst).catch(() => {}) }, [tab, nodes])
@@ -78,7 +78,7 @@ function Main() {
   const selNodes = sel.map((id) => byId.get(id)).filter(Boolean) as db.Node[]
   const run = async (label: string, fn: () => Promise<void>) => {
     setBusy(label)
-    try { await fn() } catch (e: any) { toast('⚠ ' + (e?.message || e)) } finally { setBusy(''); await refresh() }
+    try { await fn() } catch (e: any) { console.error('[FileNest] ' + label, e); toast('⚠ ' + (e?.message || e), 9000) } finally { setBusy(''); await refresh() }
   }
   const openNode = (n: db.Node) => { if (n.kind === 'folder') { setFolder(n.id); setQ(''); setFilter('all'); setSel([]) } else setPreview(n) }
   const toggle = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))

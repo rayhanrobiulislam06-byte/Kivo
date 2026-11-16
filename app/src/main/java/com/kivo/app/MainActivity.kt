@@ -19,6 +19,7 @@ import android.util.Base64
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.ValueCallback
@@ -58,6 +59,18 @@ class MainActivity : Activity() {
         private val longTasks = Executors.newSingleThreadExecutor() // download / copy / save
 
         fun q(s: String): String = JSONObject.quote(s)
+
+        // last lines of the WebView console and of native events: shown in Backup & restore -> debug log
+        private val logLines = ArrayDeque<String>()
+
+        fun addLog(line: String) {
+            synchronized(logLines) {
+                logLines.addLast(line.take(400))
+                while (logLines.size > 300) logLines.removeFirst()
+            }
+        }
+
+        fun logText(): String = synchronized(logLines) { logLines.joinToString("\n") }
     }
 
     private lateinit var container: FrameLayout
@@ -137,6 +150,7 @@ class MainActivity : Activity() {
         val s = w.settings
         s.javaScriptEnabled = true
         s.domStorageEnabled = true
+        s.databaseEnabled = true
         s.allowFileAccess = true            // needed for file:///android_asset
         s.allowContentAccess = false
         s.allowFileAccessFromFileURLs = false
@@ -192,6 +206,11 @@ class MainActivity : Activity() {
         }
 
         w.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(m: ConsoleMessage): Boolean {
+                addLog(m.messageLevel().name + " " + (m.sourceId() ?: "").substringAfterLast('/') + ":" + m.lineNumber() + " " + m.message())
+                return true
+            }
+
             override fun onShowFileChooser(
                 webView: WebView,
                 callback: ValueCallback<Array<Uri>>,
@@ -199,6 +218,7 @@ class MainActivity : Activity() {
             ): Boolean {
                 fileCallback?.onReceiveValue(null)
                 fileCallback = callback
+                addLog("native: file chooser opened (multiple=" + (params.mode == FileChooserParams.MODE_OPEN_MULTIPLE) + ")")
                 return try {
                     startActivityForResult(params.createIntent(), REQ_PICK_FILE)
                     true
@@ -239,7 +259,9 @@ class MainActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQ_PICK_FILE -> {
-                fileCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
+                val picked = WebChromeClient.FileChooserParams.parseResult(resultCode, data)
+                addLog("native: file chooser result code=" + resultCode + " files=" + (picked?.size ?: 0))
+                fileCallback?.onReceiveValue(picked)
                 fileCallback = null
             }
             REQ_PICK_MODEL -> {
@@ -250,6 +272,7 @@ class MainActivity : Activity() {
                 val src = pendingSaveFile
                 pendingSaveFile = null
                 val uri = data?.data
+                addLog("native: save dialog code=" + resultCode + " target=" + (uri != null))
                 if (resultCode == RESULT_OK && uri != null && src != null) writeSavedFile(src, uri)
                 else src?.delete()
             }
@@ -642,6 +665,9 @@ class MainActivity : Activity() {
         fun clearPending() {
             if (trusted()) KivoState.clearPending()
         }
+
+        @JavascriptInterface
+        fun getLog(): String = if (trusted()) logText() else ""
 
         @JavascriptInterface
         fun getVersion(): String = try {
